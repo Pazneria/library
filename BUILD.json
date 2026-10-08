@@ -2,8 +2,8 @@
   "sourceFiles": [
     {
       "path": "index.html",
-      "bytes": 4588,
-      "sha256": "808b4c154a8b3995675d03ab04ce6ed8e7b92abb3387cb3befd10f673731c958"
+      "bytes": 5491,
+      "sha256": "4f0d779b1bfa231b776875a83f70f9e64557ad5cf90e7e7e3c37f3592df585db"
     },
     {
       "path": "src/books.js",
@@ -16,14 +16,49 @@
       "sha256": "f412fbf9dae7b82ae2afc0368788ded8ae47a4f557419c2619b8550a0e817fce"
     },
     {
+      "path": "src/frame-loop.js",
+      "bytes": 987,
+      "sha256": "ebbfc7d05de9ca486f41b74cce2d2b61ce25dac1882c30e754ab499881623295"
+    },
+    {
+      "path": "src/interaction-core.js",
+      "bytes": 1757,
+      "sha256": "d9854682bbc2b56e2cdc6ff155b78c429032ef6f83543588cf39674b0e7f542a"
+    },
+    {
       "path": "src/look.js",
-      "bytes": 4458,
-      "sha256": "59abd9b72b511827f21115f4d10730a010779aa7f8d6f828a316e59122a5745e"
+      "bytes": 5198,
+      "sha256": "0d84d911c3286735ca9bc6333485781517ffc627291dffc2aff9bd97c0f5faa6"
     },
     {
       "path": "src/main.js",
-      "bytes": 18624,
-      "sha256": "e89eb8eb68958dc65fb1974c731bac27966ec6464c140b138791f2abddee479c"
+      "bytes": 21131,
+      "sha256": "4cc0667b94c445c77bf72ff243c2af1a028bb5c6340e7380d70f7676fa38fd48"
+    },
+    {
+      "path": "src/reading-content.js",
+      "bytes": 3059,
+      "sha256": "9a349a1687f8ea3581b443eb4e55b06189bed25e4f04db69dea958dde90749ba"
+    },
+    {
+      "path": "src/reading-scene.js",
+      "bytes": 3349,
+      "sha256": "2728a8ccf52d7828d6a5a958a9a738770e8d52b40fbdac0d04bd38fe74c17369"
+    },
+    {
+      "path": "src/reading.css",
+      "bytes": 2272,
+      "sha256": "3caa38e5897d0f0dc611d674e13e0534f8969c5ff9b05bd14d2e9737c5e76234"
+    },
+    {
+      "path": "src/reading.js",
+      "bytes": 4268,
+      "sha256": "24ade49e1efb869e3e3154b6db26ffebbb6495d4f0b3d65fedc6c688313f9067"
+    },
+    {
+      "path": "src/room-anchors.js",
+      "bytes": 835,
+      "sha256": "9ce10dc196c7602771ffbc87a7052830314b27e59a915dcd78669acbe2c3ec76"
     },
     {
       "path": "src/textures.js",
@@ -38,16 +73,21 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "docs/assets/index-DhLnrjWo.js",
-      "bytes": 533031,
-      "sha256": "b3666bdac6c2460c0d5f53fbf95271345f7e13680bc527d5205a4719fecc4eca"
+      "path": "docs/assets/index-NexkC9p6.css",
+      "bytes": 2013,
+      "sha256": "64d8d8f59930073634f5d9353f4a339565893da9f535cff7df5a11799fd2ab30"
+    },
+    {
+      "path": "docs/assets/index-WYq-Q7E8.js",
+      "bytes": 543047,
+      "sha256": "742e371b81675603c19f8548b21d01f31f13f3b3a904f530739e492e144b4e8a"
     },
     {
       "path": "docs/index.html",
-      "bytes": 4623,
-      "sha256": "a617f01c74320ed9279c00b61a04337212a9e930f5fdb139d0bb2597264f73e8"
+      "bytes": 5606,
+      "sha256": "e36780f11f8fdffb32cdc402c26f8a4f6746bbacc6f8b82e7ae2f6edea6a9667"
     }
   ],
   "base": "/library/",
-  "productionBytes": 537654
+  "productionBytes": 550666
 }

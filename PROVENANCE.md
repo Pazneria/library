@@ -19,9 +19,18 @@ task 15, then fixed separately in task 48. It does not replace the frozen
 - Identical 6,000-step movement trace SHA256:
   `1511d64895cea41c37db1c4b03a3c6f52d5bd2f0853b72683e7d44bec91cf37c`.
 
-The host copy preserves `index.html` and all five source modules byte-for-byte
-from the fixed derivative. Hosting changes are the Vite base/output directory,
-portable look-test script and documentation. `docs/` is rebuilt from that source.
+The initial base publication preserved `index.html` and all five source modules
+byte-for-byte from the fixed derivative. Its hosting changes were the Vite
+base/output directory, portable look-test script and documentation.
+
+The first-reading-layer derivative adds two small static table books and an
+interaction on the existing desk paper. `build.js`, `books.js` and `textures.js`
+remain byte-identical to that published base. Walking/collision functions and
+rendering quality/lighting are preserved. New scheduling pauses scene frames
+while reading, hidden or blurred. The added marker budget is two draw calls,
+28 triangles and one 512×384 canvas atlas, with no new lights or shadow casters.
+This is a construction budget, not a measured frame-rate claim. `docs/` is
+rebuilt from the matching source; `public/.nojekyll` makes the marker reproducible.
 
 Geometry comparisons used stubbed textures and CPU construction; the texture
 and book source files were separately compared byte-for-byte. Look tests use

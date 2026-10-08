@@ -4,6 +4,13 @@ import { rng, softDot, bookAtlas } from './textures.js';
 import { makeMaterials, buildLibrary, ROOM } from './build.js';
 import { BookSet } from './books.js';
 import { installFpsLook } from './look.js';
+import { READING_CONTENT } from './reading-content.js';
+import { ROOM_ANCHORS, INTERACTION_REACH } from './room-anchors.js';
+import { addReadingBooks } from './reading-scene.js';
+import { pickAnchor, isEditingTarget } from './interaction-core.js';
+import { installReading } from './reading.js';
+import { createFrameLoop } from './frame-loop.js';
+import './reading.css';
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -39,6 +46,7 @@ const lib = buildLibrary(M, books, rand);
 lib.B.finish(scene);
 const bookMesh = books.build(bookAtlas(31));
 scene.add(bookMesh);
+const readingBooks = addReadingBooks(scene, ROOM_ANCHORS, READING_CONTENT);
 const solids = lib.B.solids;
 // Instance buffers now own the uploaded book data. Release construction staging arrays.
 books.mats.length = books.cols.length = books.vars.length = 0;
@@ -265,8 +273,9 @@ function blocked(x, z, feet, h) {
 
 const keys = new Set();
 let crouch = false;
+let reading = null, loop = null;
 addEventListener('keydown', (e) => {
-  if (e.target?.matches?.('input, button')) return;
+  if (reading?.isOpen || loop?.paused || isEditingTarget(e.target)) return;
   keys.add(e.code);
   if (e.repeat) return;
   if (e.code === 'KeyR') setView(0);
@@ -287,8 +296,17 @@ const toastEl = document.getElementById('toast');
 let toastT = 0;
 function toast(s) { toastEl.textContent = s; toastEl.classList.add('show'); toastT = 2.2; }
 
-installFpsLook({ canvas, overlay, player: P, camera, toast,
-  releaseMovement: () => { keys.clear(); P.vel.set(0, 0, 0); },
+function releaseMovement() { keys.clear(); P.vel.set(0, 0, 0); }
+const look = installFpsLook({ canvas, overlay, player: P, camera, toast, releaseMovement,
+  isInputBlocked: () => Boolean(reading?.isOpen || loop?.paused),
+});
+const lookDirection = new THREE.Vector3();
+reading = installReading({ document, window, canvas, content: READING_CONTENT, look, releaseMovement,
+  dialog: document.getElementById('reader'), hint: document.getElementById('interaction-hint'),
+  returnFocus: overlay.querySelector('button.go'),
+  canInteract: () => overlay.classList.contains('hide') && !loop?.paused && document.hasFocus(),
+  getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), ROOM_ANCHORS, solids, INTERACTION_REACH),
+  setPaused: paused => loop?.setPaused('reading', paused)
 });
 
 const desiredVelocity = new THREE.Vector3();
@@ -347,25 +365,26 @@ function drawFrame() {
   renderer.render(scene, camera);
 }
 const frameTimes = [];
-let statT = 0, last = performance.now(), time = 0;
+let statT = 0, hintT = 0, time = 0;
 setView(0);
+updatePlayer(0); // The initial paused background uses the authored entrance camera.
 toastEl.classList.remove('show');
 renderer.compile(scene, camera);
 // upload every texture now so turning toward a new area never stalls on a first-use upload
 scene.traverse((o) => { const m = o.material; if (!m) return; for (const k of ['map', 'bumpMap']) if (m[k]) renderer.initTexture(m[k]); if (m.uniforms && m.uniforms.map) renderer.initTexture(m.uniforms.map.value); });
 renderer.shadowMap.needsUpdate = true;
 
-function frame(now) {
-  const rawDt = (now - last) / 1000;
-  last = now;
+function frame(now, rawDt) {
   const dt = Math.min(rawDt, 0.05);
   time += dt;
   updatePlayer(dt);
+  hintT += dt;
+  if (hintT >= 0.125) { hintT = 0; reading.updateHint(); }
   for (const l of lamps) if (l.userData.fire) l.intensity = l.userData.i * (0.82 + 0.12 * Math.sin(time * 9.1) + 0.08 * Math.sin(time * 23.7 + 1.3));
   window.__shafts.uniforms.t.value = time;
   dustMat.uniforms.t.value = time;
   drawFrame();
-  if (rawDt < 0.25 && document.visibilityState === 'visible') frameTimes.push(rawDt * 1000);
+  if (rawDt > 0 && rawDt < 0.25 && document.visibilityState === 'visible') frameTimes.push(rawDt * 1000);
   if (frameTimes.length > 240) frameTimes.shift();
   statT += rawDt;
   if (statT > 0.5) {
@@ -378,9 +397,32 @@ function frame(now) {
   }
   // Production quality stays at the selected scale; no automatic resolution reduction.
   if (toastT > 0) { toastT -= dt; if (toastT <= 0) toastEl.classList.remove('show'); }
-  requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+loop = createFrameLoop({ tick: frame, request: callback => window.requestAnimationFrame(callback), cancel: id => window.cancelAnimationFrame(id), now: () => performance.now() });
+const lifecycle = [];
+function listen(target, name, listener) {
+  target.addEventListener(name, listener);
+  lifecycle.push(() => target.removeEventListener(name, listener));
+}
+listen(window, 'blur', () => { releaseMovement(); loop.setPaused('focus', true); });
+listen(window, 'focus', () => loop.setPaused('focus', false));
+listen(document, 'visibilitychange', () => loop.setPaused('visibility', document.visibilityState !== 'visible'));
+listen(window, 'pagehide', event => {
+  look.pause(); loop.setPaused('page', true);
+  if (!event.persisted) {
+    reading.dispose(); look.dispose(); loop.dispose(); readingBooks.dispose(); renderer.dispose();
+    for (const remove of lifecycle) remove();
+  }
+});
+listen(window, 'pageshow', () => {
+  look.resume(); loop.setPaused('page', false);
+  loop.setPaused('visibility', document.visibilityState !== 'visible');
+  loop.setPaused('focus', !document.hasFocus());
+});
+drawFrame();
+loop.setPaused('visibility', document.visibilityState !== 'visible');
+loop.setPaused('focus', !document.hasFocus());
+loop.start();
 document.getElementById('loading').classList.add('hide');
 window.__lib = { P, setView, solids, renderer, scene, camera, books: bookMesh, drawFrame, setPrepass: (v) => (usePrepass = v),
   sim: (codes, secs) => { codes.forEach((c) => keys.add(c)); for (let t = 0; t < secs; t += 1 / 60) updatePlayer(1 / 60); codes.forEach((c) => keys.delete(c)); return P.pos.toArray().map((v) => +v.toFixed(2)); } };

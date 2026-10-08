@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5418 --strictPort --host 127.0.0.1",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-manifest.mjs",
     "preview": "vite preview --port 5418 --strictPort --host 127.0.0.1",
-    "test": "node tests/look.test.mjs"
+    "test": "node tests/look.test.mjs && node tests/reading.test.mjs"
   },
   "dependencies": {
     "three": "^0.170.0",

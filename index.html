@@ -32,7 +32,7 @@
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+<canvas id="c" tabindex="0" aria-label="Walkable Hillside Library"></canvas>
 <div id="vignette"></div>
 <div id="cross"></div>
 <div id="toast"></div>
@@ -47,6 +47,7 @@
       <tr><td>W A S D / Arrows</td><td>Walk</td></tr>
       <tr><td>Shift</td><td>Walk faster</td></tr>
       <tr><td>C</td><td>Crouch toggle (browse low shelves)</td></tr>
+      <tr><td>E / click</td><td>Read a nearby book or the writing desk</td></tr>
       <tr><td>1 – 5</td><td>Hearth · Stacks · Alcove · Stair foot · Gallery</td></tr>
       <tr><td>R</td><td>Reset to the entrance view</td></tr>
       <tr><td>F</td><td>Frame-time / FPS overlay</td></tr>
@@ -58,9 +59,26 @@
       <output id="look-sensitivity-value" for="look-sensitivity">100%</output>
     </label>
     <button class="go" type="button">Click to enter</button>
+    <p style="margin: 14px 0 0; font-size: 13px;">Two books await on the central table. The writing desk is upstairs.</p>
   </div>
 </div>
 <div id="loading">Shelving the books…</div>
+<button id="interaction-hint" type="button" hidden></button>
+<dialog id="reader" aria-labelledby="reader-title" aria-describedby="reader-kicker">
+  <div class="reader-shell">
+    <div class="reader-heading">
+      <p id="reader-kicker"></p>
+      <button id="reader-close" type="button" aria-label="Back to room">×</button>
+    </div>
+    <h2 id="reader-title" tabindex="-1"></h2>
+    <div id="reader-pages"></div>
+    <nav id="reader-links" aria-label="Reading links"></nav>
+    <div class="reader-footer">
+      <span id="reader-signature"></span>
+      <button id="reader-back" type="button">Back to room</button>
+    </div>
+  </div>
+</dialog>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>

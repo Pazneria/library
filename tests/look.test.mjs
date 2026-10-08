@@ -4,10 +4,11 @@ import vm from 'node:vm';
 class Events {
   constructor() { this.listeners = new Map(); }
   addEventListener(type, handler) { if (!this.listeners.has(type)) this.listeners.set(type, []); this.listeners.get(type).push(handler); }
+  removeEventListener(type, handler) { this.listeners.set(type, (this.listeners.get(type) || []).filter(listener => listener !== handler)); }
   emit(type, event = {}) { for (const handler of this.listeners.get(type) || []) handler(event); }
 }
 const settle = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
-function lookHarness(request = () => Promise.resolve()) {
+function lookHarness(request = () => Promise.resolve(), isInputBlocked = () => false) {
   const win = new Events(), doc = new Events(), canvas = new Events(), overlay = new Events(), slider = new Events();
   const classes = new Set();
   const output = { textContent: '100%' };
@@ -21,13 +22,16 @@ function lookHarness(request = () => Promise.resolve()) {
   doc.exitPointerLock = () => { exits++; doc.pointerLockElement = null; };
   canvas.requestPointerLock = request ? options => { requests.push(options); return request(options, requests.length); } : undefined;
   const player = { yaw: 0, pitch: 0 }, camera = { rotation: { set: (...values) => { camera.values = values; } } };
-  const context = { document: doc, addEventListener: win.addEventListener.bind(win) };
+  const context = { document: doc, windowBrand: true,
+    addEventListener(type, listener) { assert.equal(this.windowBrand, true, 'Global event listener lost its Window receiver'); win.addEventListener(type, listener); },
+    removeEventListener(type, listener) { assert.equal(this.windowBrand, true, 'Global event removal lost its Window receiver'); win.removeEventListener(type, listener); }
+  };
   vm.createContext(context);
   vm.runInContext(readFileSync(new URL('../src/look.js', import.meta.url), 'utf8').replace('export function', 'function') + ';globalThis.install=installFpsLook;', context);
-  context.install({ canvas, overlay, player, camera, releaseMovement: () => releases++, toast: message => messages.push(message) });
+  const control = context.install({ canvas, overlay, player, camera, isInputBlocked, releaseMovement: () => releases++, toast: message => messages.push(message) });
   const click = setting => overlay.emit('click', { target: { closest: () => setting } });
   const lock = () => { doc.pointerLockElement = canvas; doc.emit('pointerlockchange'); };
-  return { win, doc, canvas, overlay, slider, output, player, camera, classes, requests, messages, click, lock,
+  return { win, doc, canvas, overlay, slider, output, player, camera, classes, requests, messages, click, lock, control,
     get releases() { return releases; }, get exits() { return exits; }, setFocus: state => { focused = state; } };
 }
 const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-12, `${a} != ${b}`);
@@ -92,4 +96,27 @@ function rotateWithRenderCadence(renderEvery) {
 }
 assert.deepEqual(rotateWithRenderCadence(1), rotateWithRenderCadence(4));
 tested.push('Identical mouse counts produce identical final rotation with different simulated render cadences');
+let blocked = false;
+h = lookHarness(undefined, () => blocked);
+h.click(false); await settle(); h.lock();
+h.control.pause(); assert.equal(h.exits, 1);
+const pausedYaw = h.player.yaw, pausedRequests = h.requests.length;
+h.win.emit('focus'); h.click(false); h.win.emit('mousemove', { movementX: 100, movementY: 100 });
+close(h.player.yaw, pausedYaw); assert.equal(h.requests.length, pausedRequests);
+h.control.resume(); assert.ok(!h.classes.has('hide')); assert.equal(h.requests.length, pausedRequests);
+blocked = true; h.click(false); assert.equal(h.requests.length, pausedRequests);
+blocked = false; h.click(false); await settle(); h.lock();
+h.win.emit('mousemove', { movementX: 10, movementY: 0 }); close(h.player.yaw, pausedYaw - 0.026);
+tested.push('Reader pause blocks capture and look across focus; resume requires a fresh click; external input gate respected');
+h.control.dispose(); const disposedRequests = h.requests.length;
+h.control.resume(); h.click(false); h.win.emit('mousemove', { movementX: 100, movementY: 0 });
+assert.equal(h.requests.length, disposedRequests);
+assert.ok([...h.win.listeners.values(), ...h.doc.listeners.values(), ...h.canvas.listeners.values(), ...h.overlay.listeners.values(), ...h.slider.listeners.values()].every(listeners => listeners.length === 0));
+tested.push('Look disposal releases capture and removes every listener');
+let resolveReaderPending;
+h = lookHarness(() => new Promise(resolve => { resolveReaderPending = resolve; }));
+h.click(false); h.control.pause(); resolveReaderPending(); await settle(); h.lock();
+assert.equal(h.exits, 1); assert.ok(!h.classes.has('hide'));
+h.control.dispose();
+tested.push('Opening a reader cancels pending capture; a late native lock is released');
 console.log(JSON.stringify({status: 'passed', cases: tested, scope: 'CPU mock DOM/API events; native input and rendered feel not tested'}, null, 2));

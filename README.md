@@ -1,6 +1,6 @@
 # Library
 
-A walkable Hillside Library at the proposed GitHub Pages destination
+A walkable Hillside Library at the GitHub Pages destination
 `https://pazneria.github.io/library/`. This is the separate optimized scene with
 the owner-requested wood/paint separation and FPS mouse-look fixes.
 
@@ -22,6 +22,35 @@ resets, F shows frame stats, P changes render scale and H hides hints. Walking,
 stairs and collision behavior are unchanged. The current scene uses desktop
 keyboard and mouse controls; touch controls have not been added.
 
+## First shelf
+
+The central table holds a moss-green welcome book and a rust-colored
+**Shapes & sound** book. Approach, look at an item and press **E**, or click it.
+A small prompt appears within 2.2 m and is blocked by the room's collision
+walls/furniture. The upper northwest writing desk uses its existing paper as
+a discreet **Project Library** entrance.
+
+Reading opens a paper-colored modal, releases mouse capture and pauses the
+scene. Escape, **Back to room**, or browser Back closes it. Focus returns to
+the enter button; a fresh click/Enter resumes mouse capture. Background tabs,
+blurred windows and open reading pages do not keep scheduling scene frames.
+Closing the page tears down the added listeners, frame loop and book resources.
+
+The find explains ideal isospectral drumheads and the stronger homophonic
+point-strike example, with two primary papers linked. It makes no claim that
+arbitrary real rooms or recordings sound identical. Jippity's presence is the
+small book signature and the selected reading, with no simulated chat/activity.
+
+`src/reading-content.js` holds public words and destination links.
+`src/room-anchors.js` holds this building's three coordinates/interaction bounds.
+Stable content IDs let a future building replace the room adapter.
+
+The desk creates only a user-activated link to the existing authenticated
+Project Library. Public source inspection reveals its destination, not private
+notes or decisions. The public scene requests, embeds and stores no private
+response; it has no private-content cache, local password or substitute auth.
+The existing workspace's server-side gate, audience and storage are unchanged.
+
 ## Build and preview
 
 The lockfile retains Three 0.170.0 and Vite 5.4.21. With Node and dependencies:
@@ -37,6 +66,9 @@ Build output is tracked in `docs/`. Vite's `/library/` base makes asset paths
 work under the shared GitHub Pages hostname. A local Vite preview uses
 `http://127.0.0.1:5418/library/`; choose another free port when the owner's
 existing preview is running.
+
+The build script also refreshes `BUILD.json`; `public/.nojekyll` is copied into
+`docs/` on each build so the Pages marker survives Vite's output cleanup.
 
 ## Hosting
 
@@ -71,5 +103,6 @@ The production build passed with Vite's existing >500 kB chunk advisory.
 Hardware mouse feel, native pointer-lock behavior, visual acceptance and an FPS
 benchmark remain untested. No claim of higher frame rate is made.
 
-Project books, notes and a private study are future work, not implemented
-features of this scene.
+Project shelves and a physical private study remain future work. Personal
+notes stay in the existing authenticated Project Library; the desk offers
+navigation only.
