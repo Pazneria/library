@@ -28,7 +28,11 @@ export function disposeLibraryResources({ scene, renderer, environmentTarget, ma
   for (const instance of instances) instance.dispose();
   for (const geometry of geometries) geometry.dispose();
   for (const material of allMaterials) material.dispose();
-  for (const texture of textures) texture.dispose();
+  for (const texture of textures) {
+    texture.dispose();
+    // Disposed rooms can remain in browser history; drop generated canvas refs.
+    if (texture.isCanvasTexture) texture.image = null;
+  }
   for (const target of targets) target.dispose();
   // Three r170 renderer.dispose owns its render lists, programs and bindings.
   renderer.dispose();

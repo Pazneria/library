@@ -8,15 +8,16 @@ The frozen Lab benchmark and previous optimized copy remain separate. This repo
 contains one scene's source and compact production build, not the benchmark
 catalogue, archives, dependencies, screenshots or private project data.
 
-This exterior branch adds layered meadow planting, broadleaf trees and a wooded
-valley around the existing window views. See [EXTERIOR.md](EXTERIOR.md) for the
-isolated integration hook, resource tradeoffs, CPU checks and pending visual QA.
-The earlier import/fix receipts below describe the production base.
+This combined review branch adds public reading, a bound Shapes & Sound book,
+a Home exit and layered meadow/broadleaf woodland around the window views.
+See [INTEGRATION_REVIEW.md](INTEGRATION_REVIEW.md) for the combined checks and
+pending native/visual QA, and [EXTERIOR.md](EXTERIOR.md) for scenery tradeoffs.
+It remains a draft; the earlier import/fix receipts describe the published base.
 
 ## Controls
 
 Walking is available on arrival, before mouse capture. There is no introductory
-screen to dismiss. Click the scene to focus it and capture the mouse; Esc
+screen to dismiss. Click clear scene space to focus it and capture the mouse; Esc
 releases it and opens a compact controls dialog. Mouse input
 changes camera rotation directly, with no look interpolation or inertia. Raw
 input is requested where supported; ordinary pointer lock and left-drag are
@@ -31,14 +32,18 @@ keyboard and mouse controls; touch controls have not been added.
 
 ## First shelf
 
-The central table holds a moss-green welcome book and a rust-colored
-**Shapes & sound** book. Approach, look at an item and press **E**, or click it.
+The central table holds a moss-green welcome book and a petrol-cloth bound
+**Shapes & Sound** book with foil, ivory page edges and a plum bookmark.
+Approach, look at an item and press **E**, or deliberately click it.
 A small prompt appears within 2.2 m and is blocked by the room's collision
 walls/furniture. The upper northwest writing desk uses its existing paper as
 a discreet **Project Library** entrance.
 
 Reading opens a paper-colored modal, releases mouse capture and pauses the
-scene. Escape, **Back to room**, or browser Back closes it. Focus returns to
+scene. Shapes & Sound presents six pages as three spreads; Previous/Next,
+the spread selector, Left/Right, Page Up/Down and Home/End turn pages. Reduced
+motion skips reader animation, and narrow layouts stack the pages in order.
+Escape, the reader's return button, or browser Back closes it. Focus returns to
 the scene canvas; a fresh click/Enter resumes mouse capture. Background tabs,
 blurred windows and open reading pages do not keep scheduling scene frames.
 Closing the page tears down the added listeners, frame loop and book resources.
@@ -48,7 +53,8 @@ point-strike example, with two primary papers linked. It makes no claim that
 arbitrary real rooms or recordings sound identical. Jippity's presence is the
 small book signature and the selected reading, with no simulated chat/activity.
 
-`src/reading-content.js` holds public words and destination links.
+`src/reading-content.js` holds the welcome text and private destination link;
+`src/jippity-book/content.json` holds the editable premium book text and sources.
 `src/room-anchors.js` holds this building's three coordinates/interaction bounds.
 Stable content IDs let a future building replace the room adapter.
 
@@ -57,6 +63,12 @@ Project Library. Public source inspection reveals its destination, not private
 notes or decisions. The public scene requests, embeds and stores no private
 response; it has no private-content cache, local password or substitute auth.
 The existing workspace's server-side gate, audience and storage are unchanged.
+
+The southeast oak door returns to the homepage in the same tab through E or
+a deliberate click. Home links in the controls/legacy reader and Alt+X provide
+additional access. Leaving stops the frame loop and input, disposes both reader
+types, and releases shared scene resources once. Generated canvas references
+are dropped. A cached Back restoration reconstructs the disposed scene.
 
 ## Build and preview
 
@@ -114,7 +126,11 @@ events. They cover sensitivity, pitch, direct camera updates, fallback,
 focus/visibility, pending Escape cancellation and independence from simulated
 render cadence.
 
-The production build passed with Vite's existing >500 kB chunk advisory.
+All eleven combined CPU suites and the production build passed with Vite's
+existing >500 kB chunk advisory. The premium physical book is 466 triangles and
+one main draw call, adding 452 triangles and one main draw call over the replaced
+marker. Three generated atlases estimate 7,340,032 RGBA bytes with full mipmaps;
+this is construction accounting, not a measured GPU allocation.
 Hardware mouse feel, native pointer-lock behavior, visual acceptance and an FPS
 benchmark remain untested. No claim of higher frame rate is made.
 

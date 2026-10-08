@@ -9,6 +9,7 @@ import { ROOM_ANCHORS, INTERACTION_REACH } from './room-anchors.js';
 import { addReadingBooks } from './reading-scene.js';
 import { pickAnchor, isEditingTarget } from './interaction-core.js';
 import { installReading } from './reading.js';
+import { addHillsideBooks, installHillsideReading } from './jippity-book/hillside.js';
 import { createFrameLoop } from './frame-loop.js';
 import './reading.css';
 import { EXIT_CONTENT } from './exit-content.js';
@@ -53,7 +54,7 @@ const lib = buildLibrary(M, books, rand);
 lib.B.finish(scene);
 const bookMesh = books.build(bookAtlas(31));
 scene.add(bookMesh);
-const readingBooks = addReadingBooks(scene, ROOM_ANCHORS, READING_CONTENT);
+const readingBooks = addHillsideBooks(scene, ROOM_ANCHORS, READING_CONTENT, addReadingBooks);
 const exitGeometry = addLibraryExit(scene, M, EXIT_ANCHOR, EXIT_CONTENT);
 const solids = lib.B.solids;
 // Instance buffers now own the uploaded book data. Release construction staging arrays.
@@ -224,7 +225,7 @@ const look = installFpsLook({ canvas, overlay, menuButton: document.getElementBy
   setMenuPaused: paused => loop?.setPaused('controls', paused),
 });
 const lookDirection = new THREE.Vector3();
-reading = installReading({ document, window, canvas, content: READING_CONTENT, look, releaseMovement,
+reading = installHillsideReading({ legacyFactory: installReading, camera, solids, document, window, canvas, content: READING_CONTENT, look, releaseMovement,
   dialog: document.getElementById('reader'), hint: document.getElementById('interaction-hint'),
   returnFocus: canvas,
   canInteract: () => !libraryDisposed && !look.menuOpen && !loop?.paused && document.hasFocus(),

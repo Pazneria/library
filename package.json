@@ -7,7 +7,7 @@
     "dev": "vite --port 5418 --strictPort --host 127.0.0.1",
     "build": "vite build && node scripts/build-manifest.mjs",
     "preview": "vite preview --port 5418 --strictPort --host 127.0.0.1",
-    "test": "node tests/look.test.mjs && node tests/reading.test.mjs && node tests/entry.test.mjs && node tests/trim.test.mjs && node tests/exit.test.mjs && node tests/exterior.test.mjs && node tests/combined-exterior.test.mjs"
+    "test": "node tests/look.test.mjs && node tests/reading.test.mjs && node tests/entry.test.mjs && node tests/trim.test.mjs && node tests/exit.test.mjs && node tests/exterior.test.mjs && node tests/combined-exterior.test.mjs && node tests/premium-book/cpu.test.mjs && node tests/premium-book/three-room.test.mjs . && node tests/premium-book/integration.test.mjs . && node tests/combined-book.test.mjs"
   },
   "dependencies": {
     "three": "^0.170.0",

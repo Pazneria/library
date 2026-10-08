@@ -70,5 +70,21 @@ All nine original delivery entries and the clean frozen commit were verified.
 The three exterior modules and their test are preserved byte-for-byte. Only
 the old backdrop hook is replaced; core and exit runtime code outside it is
 unchanged. The shared scene cleanup releases exterior resources once.
-The combined build is intermediate and held for the premium book and joint
-native/visual review; it has not been published or benchmarked.
+That intermediate commit is preserved as `90be695e896491295dbc09632978e699dae83805`.
+The final combined branch adds the completed task-16 premium book snapshot.
+Its original archive SHA256 is
+`194229d49b23f4b37cf0d4d7bf9186b90093dc6eeeef8a709da59033f779b29a`;
+manifest SHA256 is
+`abfa7e92dc8dda8ffcc7bffcd4cf09f1ac3ba42e65c705ba30c676ecf2fa87ce`.
+All 38 file hashes and the original read-only archive verify. The eleven copied
+runtime files are byte exact; only the three documented host hooks are added.
+The old table-drums marker is filtered out, preserving the welcome and private
+desk. Host scene cleanup additionally drops disposed generated canvas references.
+The originals, frozen proofs, archive, timing and hash receipt remain unchanged.
+
+All eleven combined CPU suites (73 listed groups/checks plus the complete trim
+SAT audit) and the matching production build pass. This includes actual shared
+book resource disposal and mocked composite look/reader/exit behavior. The final
+draft remains held for joint native/visual review; it is not published or GPU
+benchmarked. CPU software proof images remain part of the separate frozen
+delivery and were not copied into the runtime or treated as browser screenshots.
