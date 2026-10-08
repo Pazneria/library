@@ -11,6 +11,12 @@ import { pickAnchor, isEditingTarget } from './interaction-core.js';
 import { installReading } from './reading.js';
 import { createFrameLoop } from './frame-loop.js';
 import './reading.css';
+import { EXIT_CONTENT } from './exit-content.js';
+import { EXIT_ANCHOR } from './exit-anchor.js';
+import { addLibraryExit } from './exit-scene.js';
+import { installLibraryExit } from './exit.js';
+import { disposeLibraryResources } from './exit-resources.js';
+import './exit.css';
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -47,6 +53,7 @@ lib.B.finish(scene);
 const bookMesh = books.build(bookAtlas(31));
 scene.add(bookMesh);
 const readingBooks = addReadingBooks(scene, ROOM_ANCHORS, READING_CONTENT);
+const exitGeometry = addLibraryExit(scene, M, EXIT_ANCHOR, EXIT_CONTENT);
 const solids = lib.B.solids;
 // Instance buffers now own the uploaded book data. Release construction staging arrays.
 books.mats.length = books.cols.length = books.vars.length = 0;
@@ -274,8 +281,9 @@ function blocked(x, z, feet, h) {
 const keys = new Set();
 let crouch = false;
 let reading = null, loop = null;
+let exit = null, libraryDisposed = false;
 addEventListener('keydown', (e) => {
-  if (reading?.isOpen || loop?.paused || isEditingTarget(e.target)) return;
+  if (libraryDisposed || reading?.isOpen || loop?.paused || isEditingTarget(e.target)) return;
   keys.add(e.code);
   if (e.repeat) return;
   if (e.code === 'KeyR') setView(0);
@@ -298,16 +306,22 @@ function toast(s) { toastEl.textContent = s; toastEl.classList.add('show'); toas
 
 function releaseMovement() { keys.clear(); P.vel.set(0, 0, 0); }
 const look = installFpsLook({ canvas, overlay, menuButton: document.getElementById('controls-toggle'), player: P, camera, toast, releaseMovement,
-  isInputBlocked: () => Boolean(reading?.isOpen || loop?.paused),
+  isInputBlocked: () => Boolean(libraryDisposed || reading?.isOpen || loop?.paused),
   setMenuPaused: paused => loop?.setPaused('controls', paused),
 });
 const lookDirection = new THREE.Vector3();
 reading = installReading({ document, window, canvas, content: READING_CONTENT, look, releaseMovement,
   dialog: document.getElementById('reader'), hint: document.getElementById('interaction-hint'),
   returnFocus: canvas,
-  canInteract: () => !look.menuOpen && !loop?.paused && document.hasFocus(),
+  canInteract: () => !libraryDisposed && !look.menuOpen && !loop?.paused && document.hasFocus(),
   getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), ROOM_ANCHORS, solids, INTERACTION_REACH),
   setPaused: paused => loop?.setPaused('reading', paused)
+});
+exit = installLibraryExit({ document, window, canvas, content: EXIT_CONTENT,
+  controls: overlay.querySelector('.card'), readerFooter: document.querySelector('.reader-footer'),
+  canInteract: () => !libraryDisposed && !reading.isOpen && !look.menuOpen && !loop?.paused && document.hasFocus(),
+  getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), [EXIT_ANCHOR], solids, EXIT_ANCHOR.reach),
+  beforeLeave: disposeLibrary,
 });
 
 const desiredVelocity = new THREE.Vector3();
@@ -380,7 +394,7 @@ function frame(now, rawDt) {
   time += dt;
   updatePlayer(dt);
   hintT += dt;
-  if (hintT >= 0.125) { hintT = 0; reading.updateHint(); }
+  if (hintT >= 0.125) { hintT = 0; reading.updateHint(); exit.updateHint(); }
   for (const l of lamps) if (l.userData.fire) l.intensity = l.userData.i * (0.82 + 0.12 * Math.sin(time * 9.1) + 0.08 * Math.sin(time * 23.7 + 1.3));
   window.__shafts.uniforms.t.value = time;
   dustMat.uniforms.t.value = time;
@@ -405,14 +419,23 @@ function listen(target, name, listener) {
   target.addEventListener(name, listener);
   lifecycle.push(() => target.removeEventListener(name, listener));
 }
+function disposeLibrary() {
+  if (libraryDisposed) return;
+  libraryDisposed = true;
+  releaseMovement(); look.pause(); loop?.setPaused('exit', true);
+  exit?.dispose(); reading.dispose(); look.dispose(); loop?.dispose();
+  for (const remove of lifecycle) remove();
+  disposeLibraryResources({ scene, renderer, environmentTarget,
+    materials: Object.values(M), extraMaterials: [depthMat, ...exitGeometry.materials] });
+  delete window.__shafts; delete window.__lib;
+}
 listen(window, 'blur', () => { releaseMovement(); loop.setPaused('focus', true); });
 listen(window, 'focus', () => loop.setPaused('focus', false));
 listen(document, 'visibilitychange', () => loop.setPaused('visibility', document.visibilityState !== 'visible'));
 listen(window, 'pagehide', event => {
   look.pause(); loop.setPaused('page', true);
   if (!event.persisted) {
-    reading.dispose(); look.dispose(); loop.dispose(); readingBooks.dispose(); renderer.dispose();
-    for (const remove of lifecycle) remove();
+    disposeLibrary();
   }
 });
 listen(window, 'pageshow', () => {

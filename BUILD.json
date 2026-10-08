@@ -16,6 +16,36 @@
       "sha256": "85005f900c276ae49d1d9fc6a16350ded4fda13dcbc382483ae8e4e201fb951b"
     },
     {
+      "path": "src/exit-anchor.js",
+      "bytes": 599,
+      "sha256": "a1585a22312d29edcf3266b31691fd6340ac0f0c95303b58d1eb34c67aab8bca"
+    },
+    {
+      "path": "src/exit-content.js",
+      "bytes": 448,
+      "sha256": "0e1fc0e60a880b9b40d321f27444485a32b4b9f09f384c62ef4f9706281bd08d"
+    },
+    {
+      "path": "src/exit-resources.js",
+      "bytes": 1943,
+      "sha256": "b90b1164ea2e43ca5fc40ee88dc6d4ed9950f7a004b7c5c3bb1978b0494e9ce1"
+    },
+    {
+      "path": "src/exit-scene.js",
+      "bytes": 3612,
+      "sha256": "ad523c9ec41be0d6ac6643cf2e0cc57b7125ee66cc870ae67eeac0446ff99dc0"
+    },
+    {
+      "path": "src/exit.css",
+      "bytes": 1160,
+      "sha256": "4f33a6701e4194b61f59a5ec64d26e726dbcde5bc623eeb82fe6ae48f885ae6e"
+    },
+    {
+      "path": "src/exit.js",
+      "bytes": 4375,
+      "sha256": "d07e573512d706304625ded03ee02329ba75f0b21e7e5cd92659d20e3b8dcbc9"
+    },
+    {
       "path": "src/frame-loop.js",
       "bytes": 987,
       "sha256": "ebbfc7d05de9ca486f41b74cce2d2b61ce25dac1882c30e754ab499881623295"
@@ -32,8 +62,8 @@
     },
     {
       "path": "src/main.js",
-      "bytes": 21204,
-      "sha256": "1a7716d628001e6823e1967cdea3408d9dee0b0dc28244945998c54229503261"
+      "bytes": 22506,
+      "sha256": "1f9d51eee6073f177d89efb5c700a9e79b6c1372acc76f0058a258fc91727045"
     },
     {
       "path": "src/reading-content.js",
@@ -73,21 +103,21 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "docs/assets/index-CsItSMhL.js",
-      "bytes": 544872,
-      "sha256": "095452569fa670db58887ff932cd29416e59f74186bb6a861e3d958ea275aa8a"
+      "path": "docs/assets/index-B2Pz9kd_.css",
+      "bytes": 3037,
+      "sha256": "113829a39af4a22c4700c69a08f03d70e8bb0f7d81e2329d73b286ddd8d0d7d5"
     },
     {
-      "path": "docs/assets/index-NexkC9p6.css",
-      "bytes": 2013,
-      "sha256": "64d8d8f59930073634f5d9353f4a339565893da9f535cff7df5a11799fd2ab30"
+      "path": "docs/assets/index-DJKGm0Y3.js",
+      "bytes": 550998,
+      "sha256": "f359694d4b54bf5ed936e8e13a6d3e5aa1ad533b6b06124d1cc67ec4807bc101"
     },
     {
       "path": "docs/index.html",
       "bytes": 5948,
-      "sha256": "40e2f74fca56a3b000e9baccaed9885cc2f388762b8e94d96d5db80bf8e27cf0"
+      "sha256": "60ba7970c4ffc083e7bdb59883b3bd26429167a4890b45f311ab3028992ec8ee"
     }
   ],
   "base": "/library/",
-  "productionBytes": 552833
+  "productionBytes": 559983
 }

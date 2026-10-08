@@ -1,0 +1,10 @@
+.library-exit-link { color: #f4dcae; text-decoration-color: #ae8c51; text-underline-offset: .24em; }
+.library-exit-link:focus-visible { outline: 2px solid #f4dcae; outline-offset: 5px; border-radius: 2px; }
+.library-exit-controls { display: block; margin-top: 16px; text-align: center; font-size: 14px; }
+.library-exit-reader { margin-left: 12px; font-size: 14px; }
+.library-exit-keyboard { position: fixed; z-index: 40; top: 14px; left: 14px; padding: 10px 16px; background: #241a12; border: 1px solid #ae8c51; border-radius: 3px; transform: translateY(calc(-100% - 24px)); }
+.library-exit-keyboard:focus { transform: none; }
+.library-exit-instructions { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+#exit-hint { position: fixed; z-index: 12; left: 50%; bottom: 56px; transform: translateX(-50%); padding: 8px 14px; max-width: calc(100vw - 36px); background: rgba(36,26,18,.9); color: #f4dcae; border: 1px solid rgba(174,140,81,.65); border-radius: 3px; font: 15px Georgia, serif; cursor: pointer; }
+#exit-hint[hidden] { display: none; }
+#exit-hint:focus-visible { outline: 2px solid #f4dcae; outline-offset: 4px; }
