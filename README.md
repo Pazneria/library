@@ -10,7 +10,9 @@ catalogue, archives, dependencies, screenshots or private project data.
 
 ## Controls
 
-Click to capture the mouse; Esc releases it and opens controls. Mouse input
+Walking is available on arrival, before mouse capture. There is no introductory
+screen to dismiss. Click the scene to focus it and capture the mouse; Esc
+releases it and opens a compact controls dialog. Mouse input
 changes camera rotation directly, with no look interpolation or inertia. Raw
 input is requested where supported; ordinary pointer lock and left-drag are
 fallbacks. Mouse sensitivity defaults to 0.0026 radians/count and can be adjusted
@@ -32,7 +34,7 @@ a discreet **Project Library** entrance.
 
 Reading opens a paper-colored modal, releases mouse capture and pauses the
 scene. Escape, **Back to room**, or browser Back closes it. Focus returns to
-the enter button; a fresh click/Enter resumes mouse capture. Background tabs,
+the scene canvas; a fresh click/Enter resumes mouse capture. Background tabs,
 blurred windows and open reading pages do not keep scheduling scene frames.
 Closing the page tears down the added listeners, frame loop and book resources.
 
@@ -84,16 +86,23 @@ of the deployed directory.
 
 ## Fixes and verification
 
-The lower alcove lintel and adjoining beam ends project 4 cm past the paint.
-Shared window-frame faces use 12 mm clearance; the doorway jamb bottoms and
-hidden bench back are separated from adjacent paint. Materials, lighting,
-textures, books and collision solids are preserved.
+The core follow-up places the entire alcove lintel outside the painted wall,
+ends alcove beams before the wall and below the ceiling, and clears window
+casings/reveals, cornices, rotated truss braces, gallery ends and stair edges.
+Architectural wood keeps 12 mm of physical clearance from paint. Materials,
+lighting, textures, decorative books and collision solids are preserved.
 
 Bounded CPU comparison against the prior optimized source found 66 exposed
 near-coplanar wood/paint pairs before and zero after. It verified 39 focused
 wood changes, exact other geometry/book/light/window streams, unchanged
 collision solids and an identical 6,000-step movement trace. Those comparisons
 require the separately preserved original and are recorded in `PROVENANCE.md`.
+That earlier audit examined same-normal axis-aligned near-coplanar faces only.
+The follow-up tests every transformed wood triangle against all 37 painted
+volumes using SAT: 183 intersecting piece pairs before, zero afterward, with
+no intersecting wood exempted. Flush concealed furniture backs are outside the
+12 mm architectural-clearance claim. See `CORE_REVIEW.md`.
+
 Portable look tests exercise the actual module with mock DOM/pointer-lock
 events. They cover sensitivity, pitch, direct camera updates, fallback,
 focus/visibility, pending Escape cancellation and independence from simulated

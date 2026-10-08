@@ -2,8 +2,8 @@
   "sourceFiles": [
     {
       "path": "index.html",
-      "bytes": 5491,
-      "sha256": "4f0d779b1bfa231b776875a83f70f9e64557ad5cf90e7e7e3c37f3592df585db"
+      "bytes": 5833,
+      "sha256": "711b8f114d87301006394410d87209ccc5157506b4eb02a432306529c70a52b4"
     },
     {
       "path": "src/books.js",
@@ -12,8 +12,8 @@
     },
     {
       "path": "src/build.js",
-      "bytes": 38605,
-      "sha256": "f412fbf9dae7b82ae2afc0368788ded8ae47a4f557419c2619b8550a0e817fce"
+      "bytes": 41403,
+      "sha256": "85005f900c276ae49d1d9fc6a16350ded4fda13dcbc382483ae8e4e201fb951b"
     },
     {
       "path": "src/frame-loop.js",
@@ -27,13 +27,13 @@
     },
     {
       "path": "src/look.js",
-      "bytes": 5198,
-      "sha256": "0d84d911c3286735ca9bc6333485781517ffc627291dffc2aff9bd97c0f5faa6"
+      "bytes": 6223,
+      "sha256": "3e0c4d3585c8ec8988e67c96dfab16af4f415a2f751de44da074565ed822ad0b"
     },
     {
       "path": "src/main.js",
-      "bytes": 21131,
-      "sha256": "4cc0667b94c445c77bf72ff243c2af1a028bb5c6340e7380d70f7676fa38fd48"
+      "bytes": 21204,
+      "sha256": "1a7716d628001e6823e1967cdea3408d9dee0b0dc28244945998c54229503261"
     },
     {
       "path": "src/reading-content.js",
@@ -73,21 +73,21 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
+      "path": "docs/assets/index-CsItSMhL.js",
+      "bytes": 544872,
+      "sha256": "095452569fa670db58887ff932cd29416e59f74186bb6a861e3d958ea275aa8a"
+    },
+    {
       "path": "docs/assets/index-NexkC9p6.css",
       "bytes": 2013,
       "sha256": "64d8d8f59930073634f5d9353f4a339565893da9f535cff7df5a11799fd2ab30"
     },
     {
-      "path": "docs/assets/index-_FhFPET6.js",
-      "bytes": 543302,
-      "sha256": "98f577f2ff062b9b5fd14be85dd293180ddab64a6bff2251dba24d61e30f665d"
-    },
-    {
       "path": "docs/index.html",
-      "bytes": 5606,
-      "sha256": "8fa1bc129449e7334c446e725321cd610d19221dea87586ea6cda21c4626aef4"
+      "bytes": 5948,
+      "sha256": "40e2f74fca56a3b000e9baccaed9885cc2f388762b8e94d96d5db80bf8e27cf0"
     }
   ],
   "base": "/library/",
-  "productionBytes": 550921
+  "productionBytes": 552833
 }
