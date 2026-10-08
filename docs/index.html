@@ -8,8 +8,11 @@
   html, body { margin: 0; height: 100%; overflow: hidden; background: #16110d; font-family: Georgia, 'Times New Roman', serif; color: #f1e6d2; }
   #c { display: block; width: 100vw; height: 100vh; }
   #vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(20,10,0,0.38) 100%); }
-  #overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(18,12,8,0.55); cursor: pointer; transition: opacity .3s; }
-  #overlay.hide { opacity: 0; pointer-events: none; }
+  #overlay { max-width: min(460px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border: 0; background: transparent; color: inherit; }
+  #overlay::backdrop { background: rgba(18,12,8,0.55); }
+  #controls-toggle { position: fixed; top: 12px; left: 14px; padding: 7px 10px; background: rgba(20,12,6,0.65); border: 1px solid #8a7250; border-radius: 4px; color: #e5d7bf; font: 12px system-ui, sans-serif; cursor: pointer; }
+  .reading-open #controls-toggle { visibility: hidden; }
+  button:focus-visible, #c:focus-visible { outline: 2px solid #d6aa64; outline-offset: 3px; }
   .card { max-width: 460px; padding: 28px 34px; background: rgba(30,20,14,0.88); border: 1px solid rgba(214,170,100,0.45); border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
   .card h1 { margin: 0 0 4px; font-weight: normal; font-size: 30px; letter-spacing: .5px; color: #f4dcae; }
   .card p { margin: 6px 0 16px; color: #cdb998; font-style: italic; }
@@ -30,7 +33,7 @@
   #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #16110d; color: #cdb998; font-style: italic; font-size: 18px; }
   #loading.hide { display: none; }
 </style>
-  <script type="module" crossorigin src="/library/assets/index-_FhFPET6.js"></script>
+  <script type="module" crossorigin src="/library/assets/index-CsItSMhL.js"></script>
   <link rel="stylesheet" crossorigin href="/library/assets/index-NexkC9p6.css">
 </head>
 <body>
@@ -39,11 +42,11 @@
 <div id="cross"></div>
 <div id="toast"></div>
 <div id="stats"></div>
-<div id="help">WASD move · Mouse look · Shift run · C crouch · 1–5 viewpoints · R reset · F frame stats · H hide</div>
-<div id="overlay">
+<div id="help" class="hide">WASD move · Click for mouse look · Esc controls · E read · Shift run</div>
+<button id="controls-toggle" type="button" aria-haspopup="dialog" aria-controls="overlay">Controls · Esc</button>
+<dialog id="overlay" aria-labelledby="controls-title">
   <div class="card">
-    <h1>The Hillside Library</h1>
-    <p>Late afternoon. The reading room is quiet.</p>
+    <h1 id="controls-title">Controls</h1>
     <table>
       <tr><td>Mouse</td><td>FPS look (click to capture; Esc opens controls)</td></tr>
       <tr><td>W A S D / Arrows</td><td>Walk</td></tr>
@@ -60,10 +63,9 @@
       <input id="look-sensitivity" type="range" min="40" max="220" step="5" value="100" aria-label="Mouse sensitivity" />
       <output id="look-sensitivity-value" for="look-sensitivity">100%</output>
     </label>
-    <button class="go" type="button">Click to enter</button>
-    <p style="margin: 14px 0 0; font-size: 13px;">Two books await on the central table. The writing desk is upstairs.</p>
+    <button class="go" type="button" data-resume-look>Return to room</button>
   </div>
-</div>
+</dialog>
 <div id="loading">Shelving the books…</div>
 <button id="interaction-hint" type="button" hidden></button>
 <dialog id="reader" aria-labelledby="reader-title" aria-describedby="reader-kicker">

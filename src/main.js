@@ -297,14 +297,15 @@ let toastT = 0;
 function toast(s) { toastEl.textContent = s; toastEl.classList.add('show'); toastT = 2.2; }
 
 function releaseMovement() { keys.clear(); P.vel.set(0, 0, 0); }
-const look = installFpsLook({ canvas, overlay, player: P, camera, toast, releaseMovement,
+const look = installFpsLook({ canvas, overlay, menuButton: document.getElementById('controls-toggle'), player: P, camera, toast, releaseMovement,
   isInputBlocked: () => Boolean(reading?.isOpen || loop?.paused),
+  setMenuPaused: paused => loop?.setPaused('controls', paused),
 });
 const lookDirection = new THREE.Vector3();
 reading = installReading({ document, window, canvas, content: READING_CONTENT, look, releaseMovement,
   dialog: document.getElementById('reader'), hint: document.getElementById('interaction-hint'),
-  returnFocus: overlay.querySelector('button.go'),
-  canInteract: () => overlay.classList.contains('hide') && !loop?.paused && document.hasFocus(),
+  returnFocus: canvas,
+  canInteract: () => !look.menuOpen && !loop?.paused && document.hasFocus(),
   getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), ROOM_ANCHORS, solids, INTERACTION_REACH),
   setPaused: paused => loop?.setPaused('reading', paused)
 });

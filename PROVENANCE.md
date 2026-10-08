@@ -23,14 +23,32 @@ The initial base publication preserved `index.html` and all five source modules
 byte-for-byte from the fixed derivative. Its hosting changes were the Vite
 base/output directory, portable look-test script and documentation.
 
-The first-reading-layer derivative adds two small static table books and an
-interaction on the existing desk paper. `build.js`, `books.js` and `textures.js`
-remain byte-identical to that published base. Walking/collision functions and
+The first-reading-layer PR2 derivative adds two small static table books and an
+interaction on the existing desk paper. At PR2 head `9718bb3`, `build.js`,
+`books.js` and `textures.js` remained byte-identical to the published base.
+Walking/collision functions and
 rendering quality/lighting are preserved. New scheduling pauses scene frames
 while reading, hidden or blurred. The added marker budget is two draw calls,
 28 triangles and one 512×384 canvas atlas, with no new lights or shadow casters.
 This is a construction budget, not a measured frame-rate claim. `docs/` is
 rebuilt from the matching source; `public/.nojekyll` makes the marker reproducible.
+
+The isolated core follow-up starts at PR2 head `9718bb3fddc9b4988d45fae858bab9c73b6a65b4`.
+It removes the entry card and its opacity transition, returns UI focus to the
+canvas, preserves walking before capture and requests capture only from a
+deliberate click/Enter gesture. The authored camera is initialized before the
+first compile/draw. This addresses concrete transition sources; the owner's
+reported visual glitch has not been reproduced and is not diagnosed as screen tearing.
+
+The expanded CPU audit tests all transformed wood triangles against actual
+paint volumes, including opposite-facing contact and rotated/curved wood.
+All 183 intersecting piece pairs are eliminated; architectural trim maintains
+12 mm clearance. Source piece count remains 2,441, with 382 focused piece changes
+and 96 added triangles for split window stools/reveals. UV random draws are
+preserved, as are all decorative book matrices/colors/variants, paint/shell
+geometry, collision solids, light/window definitions and exterior/render setup.
+The same 6,000-step movement trace remains exact. Public reading content,
+book component and anchors remain byte-identical to PR2 for parallel art work.
 
 Geometry comparisons used stubbed textures and CPU construction; the texture
 and book source files were separately compared byte-for-byte. Look tests use

@@ -1,5 +1,8 @@
 # First shelf: review and verification
 
+This records PR2's reading foundation. `CORE_REVIEW.md` supersedes its entry,
+return-focus, trim and look-test details for the core follow-up derivative.
+
 This layer was prepared as a draft under a browser/GPU hold. The source review
 and checks below use CPU construction and mock DOM/API events, not a rendered
 walkthrough or native input. No frame-rate improvement is claimed.

@@ -184,23 +184,34 @@ export function buildLibrary(M, books, rand) {
   wall('z', -12, -7.5, 7.4, 7.9, 0, 3.6, [[-10.4, -8.6, 0.9, 2.9]], M.sage);
   wall('x', 1.9, 7.9, -12, -11.5, 0, 3.6, [[2.9, 6.9, 0.6, 3.0]], M.sage);
   // alcove ceiling beams
-  const alcoveProjection = 0.04;
-  for (const z of [3.2, 4.9, 6.6]) W.box(M.dark, 4.5 + alcoveProjection, 0.18, 0.14, -9.25 + alcoveProjection / 2, 3.52, z);
-  W.box(M.oak, 0.3, 0.3, 5.2, -7.15 + alcoveProjection, 3.45, 4.9); // lintel stands proud of the paint
+  const alcoveFace = -7 + TRIM_CLEARANCE;
+  for (const z of [3.2, 4.9, 6.6]) W.box(M.dark, 4 - 2 * TRIM_CLEARANCE, 0.18, 0.14, -9.5, 3.6 - 0.09 - TRIM_CLEARANCE, z);
+  W.box(M.oak, 0.3, 0.3, 5.2, alcoveFace + 0.15, 3.45, 4.9); // Entire lintel is outside the painted wall.
 
   // ---- windows: frames, iron glazing bars; register shaft volumes
   function windowFrame(f, w, h, wallT, shaft = true) {
-    f.box(M.oak, w + 0.3, 0.05, wallT + 0.14 + 2 * TRIM_CLEARANCE, 0, 0.0, (-wallT + 0.14) / 2);
-    f.box(M.oak, 0.12 + TRIM_CLEARANCE, h + 0.12, 0.06, -w / 2 - 0.06 + TRIM_CLEARANCE / 2, h / 2, 0.02);
-    f.box(M.oak, 0.12 + TRIM_CLEARANCE, h + 0.12, 0.06, w / 2 + 0.06 - TRIM_CLEARANCE / 2, h / 2, 0.02);
-    f.box(M.oak, w + 0.36, 0.14 + TRIM_CLEARANCE, 0.07, 0, h + 0.07 - TRIM_CLEARANCE / 2, 0.02);
+    // A broad stool sits proud of the wall; its narrower reveal fits inside
+    // the opening. Reuse one UV offset pair so downstream authored RNG stays exact.
+    const offset = [rand(), rand()];
+    function sillPart(width, depth, z) {
+      let i = 0;
+      return boxGeo(width, 0.05, depth, M.oak.userData.ts, () => offset[i++])
+        .translate(0, 0.025 + TRIM_CLEARANCE, z);
+    }
+    const sillParts = [sillPart(w + 0.3, 0.14, 0.07 + TRIM_CLEARANCE),
+      sillPart(w - 2 * TRIM_CLEARANCE, wallT, -wallT / 2 + TRIM_CLEARANCE)];
+    f.geo(M.oak, mergeGeometries(sillParts, false), 0, 0, 0);
+    for (const part of sillParts) part.dispose();
+    f.box(M.oak, 0.12 + TRIM_CLEARANCE, h + 0.12, 0.06, -w / 2 - 0.06 + TRIM_CLEARANCE / 2, h / 2, 0.03 + TRIM_CLEARANCE);
+    f.box(M.oak, 0.12 + TRIM_CLEARANCE, h + 0.12, 0.06, w / 2 + 0.06 - TRIM_CLEARANCE / 2, h / 2, 0.03 + TRIM_CLEARANCE);
+    f.box(M.oak, w + 0.36, 0.14 + TRIM_CLEARANCE, 0.07, 0, h + 0.07 - TRIM_CLEARANCE / 2, 0.035 + TRIM_CLEARANCE);
     const zc = -wallT * 0.55;
-    f.box(M.dark, w, 0.07, 0.07, 0, 0.06, zc); f.box(M.dark, w, 0.07, 0.07, 0, h - 0.035, zc);
-    f.box(M.dark, 0.07, h, 0.07, -w / 2 + 0.035, h / 2, zc); f.box(M.dark, 0.07, h, 0.07, w / 2 - 0.035, h / 2, zc);
+    f.box(M.dark, w - 2 * TRIM_CLEARANCE, 0.07, 0.07, 0, 0.06, zc); f.box(M.dark, w - 2 * TRIM_CLEARANCE, 0.07, 0.07, 0, h - 0.035 - TRIM_CLEARANCE, zc);
+    f.box(M.dark, 0.07, h - 2 * TRIM_CLEARANCE, 0.07, -w / 2 + 0.035 + TRIM_CLEARANCE, h / 2, zc); f.box(M.dark, 0.07, h - 2 * TRIM_CLEARANCE, 0.07, w / 2 - 0.035 - TRIM_CLEARANCE, h / 2, zc);
     const nv = Math.max(1, Math.round(w / 0.62));
     for (let i = 1; i < nv; i++) f.box(M.iron, 0.03, h, 0.035, -w / 2 + (w * i) / nv, h / 2, zc);
     const nh = Math.max(1, Math.round(h / 0.55));
-    for (let i = 1; i < nh; i++) f.box(i % 4 === 0 ? M.dark : M.iron, w, i % 4 === 0 ? 0.06 : 0.025, 0.035, 0, (h * i) / nh, zc);
+    for (let i = 1; i < nh; i++) f.box(i % 4 === 0 ? M.dark : M.iron, w - 2 * TRIM_CLEARANCE, i % 4 === 0 ? 0.06 : 0.025, 0.035, 0, (h * i) / nh, zc);
     if (shaft) {
       const c = [];
       for (const [px, py] of [[-w / 2, 0], [w / 2, 0], [w / 2, h], [-w / 2, h]]) c.push(new THREE.Vector3(px, py, zc).applyMatrix4(f.m));
@@ -216,20 +227,23 @@ export function buildLibrary(M, books, rand) {
   windowFrame(W.sub(-4, 4.5, 9, Math.PI), 2, 3.8, 0.5);
   windowFrame(W.sub(3.6, 4.5, 9, Math.PI), 2, 3.8, 0.5);
   // casing around alcove opening
-  for (const z of [2.33, 7.47]) W.box(M.oak, 0.14, 3.5 + TRIM_CLEARANCE, 0.6, -6.95, (3.5 - TRIM_CLEARANCE) / 2, z);
+  for (const z of [2.33, 7.47]) W.box(M.oak, 0.14, 3.5 + TRIM_CLEARANCE, 0.6, -7 + 0.07 + TRIM_CLEARANCE, (3.5 - TRIM_CLEARANCE) / 2, z);
   // wainscot under west windows & east wall south end
-  for (const z of [-4.6, -0.6]) W.box(M.dark, 0.04, 0.85, 2.0, -6.98, 0.45, z);
-  W.box(M.dark, 0.05, 1.0, 2.2, 6.97, 0.5, 7.85);
-  W.box(M.oak, 0.08, 0.06, 2.3, 6.96, 1.02, 7.85);
+  for (const z of [-4.6, -0.6]) W.box(M.dark, 0.04, 0.85, 2.0, -6.98 + TRIM_CLEARANCE, 0.45, z);
+  W.box(M.dark, 0.05, 1.0, 2.2 - TRIM_CLEARANCE, 7 - 0.025 - TRIM_CLEARANCE, 0.5, 7.85 - TRIM_CLEARANCE / 2);
+  W.box(M.oak, 0.08, 0.06, 2.3 - TRIM_CLEARANCE, 6.96 - TRIM_CLEARANCE, 1.02, 7.85 - TRIM_CLEARANCE / 2);
 
   // ---- cornice, plaster band at gallery height, curtains at the tall windows
   for (const [w, d, x, z] of [[14, 0.3, 0, -9.85], [14, 0.3, 0, 8.85], [0.3, 19, -6.85, -0.5], [0.3, 19, 6.85, -0.5]]) {
-    W.box(M.oak, w, 0.22, d, x, H - 0.11, z);
-    W.box(M.dark, w + (w > 1 ? 0 : 0.1), 0.08, d + (d > 1 ? 0 : 0.12), x, H - 0.26, z);
+    const cx = x ? x - Math.sign(x) * TRIM_CLEARANCE : x;
+    const cz = z === -0.5 ? z : z - Math.sign(z) * TRIM_CLEARANCE;
+    W.box(M.oak, w > 1 ? w - 2 * TRIM_CLEARANCE : w, 0.22, d > 1 ? d - 2 * TRIM_CLEARANCE : d, cx, H - 0.11 - TRIM_CLEARANCE, cz);
+    W.box(M.dark, w > 1 ? w - 2 * TRIM_CLEARANCE : w + 0.1, 0.08, d > 1 ? d - 2 * TRIM_CLEARANCE : d + 0.12,
+      cx - (x ? Math.sign(x) * 0.05 : 0), H - 0.26, cz - (z === -0.5 ? 0 : Math.sign(z) * 0.06));
   }
-  W.box(M.oak, 0.12, 0.1, 19, -6.94, 8.4, -0.5);
-  W.box(M.oak, 14, 0.1, 0.12, 0, 8.4, 8.94);
-  W.box(M.oak, 0.12, 0.1, 19, 6.94, 8.4, -0.5);
+  W.box(M.oak, 0.12, 0.1, 19 - 2 * TRIM_CLEARANCE, -6.94 + TRIM_CLEARANCE, 8.4, -0.5);
+  W.box(M.oak, 14 - 2 * TRIM_CLEARANCE, 0.1, 0.12, 0, 8.4, 8.94 - TRIM_CLEARANCE);
+  W.box(M.oak, 0.12, 0.1, 19 - 2 * TRIM_CLEARANCE, 6.94 - TRIM_CLEARANCE, 8.4, -0.5);
   for (const zc of [-4.6, -0.6]) {
     W.cyl(M.iron, 0.02, 0.02, 2.9, -6.82, 7.55, zc, 8, Math.PI / 2, 0, 0);
     for (const s of [-1, 1]) {
@@ -242,24 +256,25 @@ export function buildLibrary(M, books, rand) {
 
   // ---- ceiling trusses
   for (const z of [-8.2, -4.6, -1.0, 2.6, 6.2]) {
-    W.box(M.dark, 14, 0.38, 0.3, 0, 9.85, z);
-    W.box(M.dark, 0.24, 0.6, 0.24, 0, 10.2, z);
+    W.box(M.dark, 14 - 2 * TRIM_CLEARANCE, 0.38, 0.3, 0, 9.85, z);
+    W.box(M.dark, 0.24, 0.6, 0.24, 0, 10.2 - TRIM_CLEARANCE, z);
     for (const s of [-1, 1]) {
-      W.box(M.dark, 0.2, 1.4, 0.22, s * 6.55, 9.2, z, 0, 0, s * 0.62);
+      const braceExtent = (0.2 * Math.cos(0.62) + 1.4 * Math.sin(0.62)) / 2;
+      W.box(M.dark, 0.2, 1.4, 0.22, s * (7 - TRIM_CLEARANCE - braceExtent), 9.2, z, 0, 0, s * 0.62);
       W.box(M.iron, 0.36, 0.42, 0.32, s * 3.4, 9.85, z);
-      W.box(M.dark, 0.25, 0.7, 0.32, s * 6.88, 9.2, z);
+      W.box(M.dark, 0.25, 0.7, 0.32, s * (7 - 0.125 - TRIM_CLEARANCE), 9.2, z);
     }
   }
-  for (const x of [-3.4, 3.4]) W.box(M.dark, 0.2, 0.24, 19, x, 10.25, -0.5);
+  for (const x of [-3.4, 3.4]) W.box(M.dark, 0.2, 0.24, 19 - 2 * TRIM_CLEARANCE, x, 10.25, -0.5);
 
   // ---- gallery
   W.sbox(M.floor, 14, 0.35, 3, 0, GY - 0.175, -8.5);
   W.sbox(M.floor, 2.8, 0.35, 5.8, 5.6, GY - 0.175, -4.1);
-  for (let x = -6.6; x < 4.2; x += 0.9) W.box(M.dark, 0.12, 0.24, 3, x, GY - 0.47, -8.5);
-  for (let z = -6.6; z < -1.2; z += 0.9) W.box(M.dark, 2.8, 0.24, 0.12, 5.6, GY - 0.47, z);
-  W.box(M.oak, 11.42, 0.55, 0.24, -1.4, GY - 0.27, -6.9);
+  for (let x = -6.6; x < 4.2; x += 0.9) W.box(M.dark, 0.12, 0.24, 3 - TRIM_CLEARANCE, x, GY - 0.47, -8.5 + TRIM_CLEARANCE / 2);
+  for (let z = -6.6; z < -1.2; z += 0.9) W.box(M.dark, 2.8 - TRIM_CLEARANCE, 0.24, 0.12, 5.6 - TRIM_CLEARANCE / 2, GY - 0.47, z);
+  W.box(M.oak, 11.31 - TRIM_CLEARANCE, 0.55, 0.24, -1.345 + TRIM_CLEARANCE / 2, GY - 0.27, -6.9);
   W.box(M.oak, 0.24, 0.55, 5.9, 4.3, GY - 0.27, -4.15);
-  W.box(M.dark, 11.42, 0.06, 0.3, -1.4, GY - 0.02, -6.9); W.box(M.dark, 0.3, 0.06, 5.9, 4.3, GY - 0.02, -4.15);
+  W.box(M.dark, 11.31 - TRIM_CLEARANCE, 0.06, 0.3, -1.345 + TRIM_CLEARANCE / 2, GY - 0.02, -6.9); W.box(M.dark, 0.3, 0.06, 5.9, 4.3, GY - 0.02, -4.15);
   // iron columns with brackets
   const cols = [[-4.6, -6.9, 'x'], [-1.4, -6.9, 'x'], [1.8, -6.9, 'x'], [4.3, -6.9, 'c'], [4.3, -4.1, 'z'], [4.3, -1.35, 'z']];
   for (const [x, z, ax] of cols) {
@@ -275,14 +290,14 @@ export function buildLibrary(M, books, rand) {
     }
   }
   // balustrades
-  function railing(x0, z0, x1, z1, y, postEvery = 2.4) {
+  function railing(x0, z0, x1, z1, y, postEvery = 2.4, authoredLength) {
     const len = Math.hypot(x1 - x0, z1 - z0);
     const ang = Math.atan2(-(z1 - z0), x1 - x0);
     const f = W.sub(x0, y, z0, ang);
     f.box(M.oak, len + 0.06, 0.07, 0.13, len / 2, 1.02, 0);
     f.box(M.iron, len, 0.04, 0.05, len / 2, 0.97, 0);
     f.box(M.iron, len, 0.04, 0.05, len / 2, 0.1, 0);
-    const n = Math.round(len / 0.13);
+    const n = Math.round((authoredLength || len) / 0.13);
     for (let i = 1; i < n; i++) {
       const x = (len * i) / n;
       f.box(M.iron, 0.02, 0.86, 0.02, x, 0.53, 0);
@@ -294,12 +309,16 @@ export function buildLibrary(M, books, rand) {
       f.box(M.oak, 0.11, 1.12, 0.11, x, 0.56, 0);
       f.sphere(M.oak, 0.065, x, 1.16, 0, 1, 0.8, 1);
     }
-    f.solid(len, 1.1, 0.16, len / 2, 0.55, 0);
+    // The west end's visible wood moves clear of paint; retain its authored
+    // collision rail and decorative count so movement and downstream RNG stay exact.
+    const collisionFrame = authoredLength ? W.sub(-7, y, z0, ang) : f;
+    const collisionLength = authoredLength || len;
+    collisionFrame.solid(collisionLength, 1.1, 0.16, collisionLength / 2, 0.55, 0);
   }
-  railing(-7, -6.92, 4.3, -6.92, GY);
+  railing(-7 + 0.065 + TRIM_CLEARANCE, -6.92, 4.3, -6.92, GY, 2.4, 11.3);
   railing(4.3, -6.92, 4.3, -1.25, GY, 1.9);
   // west end cap of gallery & under-gallery plaster
-  W.box(M.oak, 0.08, 0.3, 3, -6.96, GY + 0.1, -8.5);
+  W.box(M.oak, 0.08, 0.3, 3 - TRIM_CLEARANCE, -6.96 + TRIM_CLEARANCE, GY + 0.1, -8.5 + TRIM_CLEARANCE / 2);
 
   // ---- broad staircase along the east wall, rising north to the east gallery
   const R = GY / 24, TD = 0.3, X0 = 4.2, X1 = 7, ZB = 6.7;
@@ -310,8 +329,8 @@ export function buildLibrary(M, books, rand) {
   for (let i = 13; i <= 23; i++) steps.push({ y: i * R, z0: 2.1 - (i - 12) * TD, z1: 2.1 - (i - 13) * TD });
   for (const s of steps) {
     const d = s.z1 - s.z0, zc = (s.z0 + s.z1) / 2;
-    W.box(M.dark, sw, s.y - 0.045, d, sx, (s.y - 0.045) / 2, zc);
-    W.box(M.oak, sw + 0.03, 0.045, d + 0.035, sx - 0.015, s.y - 0.0225, zc + 0.0175);
+    W.box(M.dark, sw - TRIM_CLEARANCE, s.y - 0.045, d, sx - TRIM_CLEARANCE / 2, (s.y - 0.045) / 2, zc);
+    W.box(M.oak, sw + 0.03 - TRIM_CLEARANCE, 0.045, d + 0.035, sx - 0.015 - TRIM_CLEARANCE / 2, s.y - 0.0225, zc + 0.0175);
     W.solid(sw, s.y, d, sx, s.y / 2, zc);
     // carpet runner and brass rod
     W.box(M.runner, 1.5, 0.012, d, sx + 0.15, s.y + 0.006, zc + 0.01);
@@ -354,13 +373,19 @@ export function buildLibrary(M, books, rand) {
     const spacing = (Ht - base - 0.12) / nShelves;
     f.box(M.dark, L, base, D - 0.03, L / 2, base / 2, -D / 2 - 0.015);
     f.box(M.walnut, L, Ht, 0.02, L / 2, Ht / 2, -D + 0.01);
-    f.box(M.walnut, L + 0.06, 0.07, D + 0.05, L / 2, Ht - 0.035, -D / 2 + 0.025);
-    f.box(M.walnut, L + 0.12, 0.05, D + 0.09, L / 2, Ht + 0.025, -D / 2 + 0.045);
-    if (!opt.noCornice) f.box(M.dark, L + 0.02, 0.1, 0.03, L / 2, Ht - 0.12, 0.01);
+    function cornice(mat, extra, h, d, y, z) {
+      const left = opt.wallLeft ? TRIM_CLEARANCE : -extra / 2;
+      const right = opt.wallRight ? L - TRIM_CLEARANCE : L + extra / 2;
+      f.box(mat, right - left, h, d, (left + right) / 2, y, z);
+    }
+    cornice(M.walnut, 0.06, 0.07, D + 0.05, Ht - 0.035, -D / 2 + 0.025);
+    cornice(M.walnut, 0.12, 0.05, D + 0.09, Ht + 0.025, -D / 2 + 0.045);
+    if (!opt.noCornice) cornice(M.dark, 0.02, 0.1, 0.03, Ht - 0.12, 0.01);
     for (let b = 0; b <= bays; b++) {
       const x = Math.min(L - 0.02, Math.max(0.02, b * bw));
       f.box(M.walnut, 0.04, Ht - 0.07, D, x, (Ht - 0.07) / 2, -D / 2);
-      f.box(M.dark, 0.06, Ht - 0.2, 0.015, x, Ht / 2 - 0.05, 0.005);
+      const trimX = b === 0 && opt.wallLeft ? 0.03 + TRIM_CLEARANCE : b === bays && opt.wallRight ? L - 0.03 - TRIM_CLEARANCE : x;
+      f.box(M.dark, 0.06, Ht - 0.2, 0.015, trimX, Ht / 2 - 0.05, 0.005);
     }
     for (let b = 0; b < bays; b++) {
       const xa = b * bw + 0.02, xb = (b + 1) * bw - 0.02;
@@ -379,15 +404,15 @@ export function buildLibrary(M, books, rand) {
     if (opt.solid !== false) f.solid(L, Ht + 0.05, D, L / 2, Ht / 2, -D / 2);
   }
   // lower level
-  bookcase(W.sub(-7, 0, -9.6, 0), 14, 3.45, 0.4);
+  bookcase(W.sub(-7, 0, -9.6, 0), 14, 3.45, 0.4, { wallLeft: true, wallRight: true });
   bookcase(W.sub(-6.6, 0, -5.75, Math.PI / 2), 3.85, 3.45, 0.4);
   bookcase(W.sub(6.6, 0, -9.6, -Math.PI / 2), 8.4, 3.45, 0.4, { spacing: 0.4 });
   bookcase(W.sub(-6.6, 0, -1.7, Math.PI / 2), 1.8, 2.4, 0.36, { spacing: 0.36 });
   bookcase(W.sub(-6.6, 0, 2.3, Math.PI / 2), 1.8, 2.4, 0.36, { spacing: 0.42 });
-  bookcase(W.sub(-1.4, 0, 8.6, Math.PI), 5.6, 3.2, 0.4, { spacing: 0.4 });
-  bookcase(W.sub(7, 0, 8.6, Math.PI), 5.6, 3.2, 0.4, { spacing: 0.37 });
+  bookcase(W.sub(-1.4, 0, 8.6, Math.PI), 5.6, 3.2, 0.4, { spacing: 0.4, wallRight: true });
+  bookcase(W.sub(7, 0, 8.6, Math.PI), 5.6, 3.2, 0.4, { spacing: 0.37, wallLeft: true });
   // gallery level
-  bookcase(W.sub(-7, GY, -9.6, 0), 14, 3.8, 0.4, { spacing: 0.4 });
+  bookcase(W.sub(-7, GY, -9.6, 0), 14, 3.8, 0.4, { spacing: 0.4, wallLeft: true, wallRight: true });
   bookcase(W.sub(-6.6, GY, -7.0, Math.PI / 2), 2.6, 3.8, 0.4, { spacing: 0.4 });
   bookcase(W.sub(6.6, GY, -9.6, -Math.PI / 2), 8.4, 3.8, 0.4, { spacing: 0.39 });
   // freestanding double-sided stacks (east-west, so late light runs down the aisles)
@@ -539,12 +564,12 @@ export function buildLibrary(M, books, rand) {
     f.solid(2.7, 1.72, 0.8, 0, 0.86, 0.4);
     // mantel objects
     candle(f, -1.05, 1.72, 0.25); candle(f, 1.05, 1.72, 0.25, 0.14);
-    f.box(M.dark, 0.32, 0.36, 0.14, 0, 1.9, 0.22);
-    f.cyl(M.ceramic, 0.11, 0.11, 0.02, 0, 1.94, 0.3, 20, Math.PI / 2, 0, 0);
-    f.cyl(M.brass, 0.125, 0.125, 0.015, 0, 1.94, 0.295, 20, Math.PI / 2, 0, 0);
+    f.box(M.dark, 0.32, 0.36, 0.14, 0, 1.9, 0.37 + TRIM_CLEARANCE);
+    f.cyl(M.ceramic, 0.11, 0.11, 0.02, 0, 1.94, 0.45 + TRIM_CLEARANCE, 20, Math.PI / 2, 0, 0);
+    f.cyl(M.brass, 0.125, 0.125, 0.015, 0, 1.94, 0.445 + TRIM_CLEARANCE, 20, Math.PI / 2, 0, 0);
     f.cyl(M.terracotta, 0.05, 0.08, 0.22, 0.6, 1.83, 0.22, 12);
     stackOn(f, -0.6, 1.72, 0.24, 2, 0.3);
-    picture(f, 1.4, 0.95, 0, 3.5, 0.31, 2);
+    picture(f, 1.4, 0.95, 0, 3.5, 0.325 + TRIM_CLEARANCE, 2);
     // fire tools
     f.cyl(M.iron, 0.012, 0.012, 0.8, 1.32, 0.4, 0.55, 6, 0, 0, 0.08);
     f.cyl(M.brass, 0.025, 0.025, 0.06, 1.35, 0.82, 0.55, 8);
