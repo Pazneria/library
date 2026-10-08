@@ -7,7 +7,7 @@ export function installReading({ document: doc, window: win, canvas, dialog, hin
   const pages = dialog.querySelector('#reader-pages'), links = dialog.querySelector('#reader-links');
   const signature = dialog.querySelector('#reader-signature');
   const removers = [];
-  let currentId = null, disposed = false, pendingBack = false;
+  let currentId = null, disposed = false, pendingBack = false, press = null;
   function on(target, event, listener) {
     target.addEventListener(event, listener);
     removers.push(() => target.removeEventListener(event, listener));
@@ -62,7 +62,17 @@ export function installReading({ document: doc, window: win, canvas, dialog, hin
     if (event.code !== 'KeyE' || event.repeat || currentId !== null || isEditingTarget(event.target)) return;
     if (openNearby()) event.preventDefault();
   });
-  on(canvas, 'click', openNearby); on(hint, 'click', openNearby);
+  on(canvas, 'mousedown', event => {
+    press = event.button === 0 ? { x: event.clientX, y: event.clientY, dragged: false } : null;
+  });
+  on(win, 'mousemove', event => {
+    if (press && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 5) press.dragged = true;
+  });
+  on(canvas, 'click', event => {
+    const dragged = press?.dragged; press = null;
+    if (!dragged && (event.button === undefined || event.button === 0)) openNearby();
+  });
+  on(hint, 'click', openNearby);
   on(dialog, 'cancel', event => { event.preventDefault(); close(); });
   on(dialog.querySelector('#reader-close'), 'click', close);
   on(dialog.querySelector('#reader-back'), 'click', close);

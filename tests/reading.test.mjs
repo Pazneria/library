@@ -138,6 +138,9 @@ globalThis.fetch = () => { networkCalls++; throw new Error('Public reader must n
 try {
   const h = harness();
   h.controller.updateHint(); assert.equal(h.hint.hidden, false); assert.equal(h.hint.textContent, 'E — Welcome book');
+  h.canvas.emit('mousedown', { button: 0, clientX: 100, clientY: 100 });
+  h.win.emit('mousemove', { clientX: 110, clientY: 100 }); h.canvas.emit('click', { button: 0 });
+  assert.equal(h.controller.isOpen, false, 'FPS left-drag must not become a read click');
   h.win.emit('keydown', { code: 'KeyE', target: new Element('textarea') }); assert.equal(h.controller.isOpen, false);
   h.win.emit('keydown', { code: 'KeyE', target: new Element('div'), repeat: true }); assert.equal(h.controller.isOpen, false);
   const event = h.win.emit('keydown', { code: 'KeyE', target: new Element('div') });
@@ -153,7 +156,7 @@ try {
   h.flushPop(); assert.deepEqual(h.win.history.state, { unrelated: 'preserved' });
   h.win.history.forward(); h.flushPop(); assert.ok(h.controller.isOpen);
   h.win.history.back(); h.flushPop(); assert.equal(h.controller.isOpen, false);
-  cases.push('E opens nearby content; repeats/editors ignored; modal pauses/releases look and movement; Escape closes, restores focus, and consumes only its own history entry; Back/Forward work');
+  cases.push('E/plain click opens nearby content; drag-look, repeats and editors ignored; modal pauses/releases look and movement; Escape restores focus and its own history; Back/Forward work');
 
   h.state.target = ROOM_ANCHORS[1]; h.canvas.emit('click');
   assert.deepEqual(h.elements['reader-links'].children.map(a => a.href), READING_CONTENT.drums.links.map(link => link.href));

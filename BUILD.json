@@ -52,8 +52,8 @@
     },
     {
       "path": "src/reading.js",
-      "bytes": 4268,
-      "sha256": "24ade49e1efb869e3e3154b6db26ffebbb6495d4f0b3d65fedc6c688313f9067"
+      "bytes": 4708,
+      "sha256": "6c947b8db23208cd5a84571e6c058a3bffa37fa7b0eff09b4d40008530f3d74b"
     },
     {
       "path": "src/room-anchors.js",
@@ -78,16 +78,16 @@
       "sha256": "64d8d8f59930073634f5d9353f4a339565893da9f535cff7df5a11799fd2ab30"
     },
     {
-      "path": "docs/assets/index-WYq-Q7E8.js",
-      "bytes": 543047,
-      "sha256": "742e371b81675603c19f8548b21d01f31f13f3b3a904f530739e492e144b4e8a"
+      "path": "docs/assets/index-_FhFPET6.js",
+      "bytes": 543302,
+      "sha256": "98f577f2ff062b9b5fd14be85dd293180ddab64a6bff2251dba24d61e30f665d"
     },
     {
       "path": "docs/index.html",
       "bytes": 5606,
-      "sha256": "e36780f11f8fdffb32cdc402c26f8a4f6746bbacc6f8b82e7ae2f6edea6a9667"
+      "sha256": "8fa1bc129449e7334c446e725321cd610d19221dea87586ea6cda21c4626aef4"
     }
   ],
   "base": "/library/",
-  "productionBytes": 550666
+  "productionBytes": 550921
 }
