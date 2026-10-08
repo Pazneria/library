@@ -59,3 +59,16 @@ Raw input behavior follows the
 [Pointer Lock specification](https://w3c.github.io/pointerlock/).
 Owner acceptance still needs native browser testing when the test window is
 available.
+
+The combined integration retains core commit `6d0e838` and local core-plus-exit
+commit `6331682`, then applies the frozen exterior source delivery from task 17,
+commit `7b1d4c873ae04ff8fa3701da6275412147917171`. Original source patch SHA256:
+`dcab1a81614faef34824aa3db56c069956ad7db7247fa304a94bc2a34f8cde30`;
+original source/build archive SHA256:
+`78527a1d6c3f2b0ea5768fba7f4345f2a2f89614b083e5600a90f40e21d4f1ef`.
+All nine original delivery entries and the clean frozen commit were verified.
+The three exterior modules and their test are preserved byte-for-byte. Only
+the old backdrop hook is replaced; core and exit runtime code outside it is
+unchanged. The shared scene cleanup releases exterior resources once.
+The combined build is intermediate and held for the premium book and joint
+native/visual review; it has not been published or benchmarked.

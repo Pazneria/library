@@ -8,6 +8,11 @@ The frozen Lab benchmark and previous optimized copy remain separate. This repo
 contains one scene's source and compact production build, not the benchmark
 catalogue, archives, dependencies, screenshots or private project data.
 
+This exterior branch adds layered meadow planting, broadleaf trees and a wooded
+valley around the existing window views. See [EXTERIOR.md](EXTERIOR.md) for the
+isolated integration hook, resource tradeoffs, CPU checks and pending visual QA.
+The earlier import/fix receipts below describe the production base.
+
 ## Controls
 
 Walking is available on arrival, before mouse capture. There is no introductory
@@ -60,6 +65,7 @@ The lockfile retains Three 0.170.0 and Vite 5.4.21. With Node and dependencies:
 ```sh
 npm ci
 npm test
+node tests/exterior.test.mjs
 npm run build
 npm run preview
 ```

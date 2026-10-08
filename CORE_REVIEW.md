@@ -1,5 +1,9 @@
 # Seamless entry and physical trim review
 
+This records the focused core PR3. The combined copy's `INTEGRATION_REVIEW.md`
+records subsequent exit and frozen exterior integration; its exterior hook
+supersedes the preserved-backdrop statement below for this combined copy.
+
 This is a focused draft stacked on PR2 head `9718bb3`. It does not publish a
 new live build or change the preserved `library-reading`, `library-fps`,
 previous optimized source or frozen benchmark. No browser/GPU/native input

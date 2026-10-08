@@ -17,6 +17,7 @@ import { addLibraryExit } from './exit-scene.js';
 import { installLibraryExit } from './exit.js';
 import { disposeLibraryResources } from './exit-resources.js';
 import './exit.css';
+import { createExterior } from './exterior/index.js';
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -88,96 +89,9 @@ for (const l of lib.lights) {
   lamps.push(p);
 }
 
-// --------------------------------------------------------------- sky + hillside backdrop
-const horizon = new THREE.Color(1.0, 0.66, 0.42);
-{
-  const g = new THREE.SphereGeometry(1200, 32, 16);
-  const m = new THREE.ShaderMaterial({
-    side: THREE.BackSide, depthWrite: false,
-    uniforms: { sunDir: { value: sunDir } },
-    vertexShader: `varying vec3 vDir; void main(){ vDir = position; vec4 p = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position = p.xyww; }`,
-    fragmentShader: `uniform vec3 sunDir; varying vec3 vDir;
-      void main(){ vec3 d = normalize(vDir); float h = d.y;
-        vec3 zen = vec3(0.16,0.27,0.55); vec3 hor = vec3(1.25,0.74,0.45); vec3 below = vec3(0.55,0.42,0.36);
-        vec3 col = mix(hor, zen, pow(clamp(h,0.0,1.0), 0.5));
-        col = mix(col, below, smoothstep(0.0,-0.2,h));
-        float s = max(dot(d, sunDir), 0.0);
-        col += vec3(1.0,0.55,0.25)*pow(s,5.0)*0.7 + vec3(1.0,0.75,0.45)*pow(s,90.0)*2.5 + smoothstep(0.9993,0.9996,s)*vec3(18.0,12.0,7.0);
-        gl_FragColor = vec4(col,1.0);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
-      }`,
-  });
-  const sky = new THREE.Mesh(g, m);
-  sky.frustumCulled = false;
-  sky.renderOrder = -1;
-  scene.add(sky);
-}
-function terrainH(x, z) {
-  let h = -0.7;
-  const w = Math.max(0, -x - 13);
-  h -= 70 * (1 - Math.exp(-w / 140));
-  h += (Math.sin(x * 0.011 + z * 0.017) * 10 + Math.sin(z * 0.029 + 1.3) * Math.cos(x * 0.013) * 12) * Math.min(1, w / 120);
-  if (x < -420) h += Math.min(140, (-x - 420) * 0.22) * (0.75 + 0.18 * Math.sin(z * 0.009 + 0.5) + 0.07 * Math.sin(z * 0.043));
-  if (x > 8) h += (x - 8) * 0.35;
-  if (Math.abs(z) > 30 && x > -60) h += (Math.abs(z) - 30) * 0.12;
-  return h;
-}
-{
-  const N = 220, S = 1800;
-  const g = new THREE.PlaneGeometry(S, S, N, N);
-  g.rotateX(-Math.PI / 2);
-  const pos = g.attributes.position;
-  const col = new Float32Array(pos.count * 3);
-  const grassA = new THREE.Color(0.24, 0.27, 0.1), grassB = new THREE.Color(0.34, 0.3, 0.12), tmp = new THREE.Color();
-  const sunFlat = new THREE.Vector3(sunDir.x, sunDir.y, sunDir.z);
-  // Keep the original normal stream; only its discarded colour pass is omitted.
-  for (let i = 0; i < pos.count; i++) pos.setY(i, terrainH(pos.getX(i), pos.getZ(i)));
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  g.computeVertexNormals();
-  const t = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true }));
-  t.position.x = -300;
-  t.matrixAutoUpdate = false; t.updateMatrix();
-  scene.add(t);
-  // Final world-space heights and colours in a single pass.
-  const terrainNormal = new THREE.Vector3();
-  const terrainHaze = new THREE.Color(0.86, 0.6, 0.48);
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i) - 300, z = pos.getZ(i);
-    pos.setY(i, terrainH(x, z));
-    const nx = terrainH(x - 1, z) - terrainH(x + 1, z), nz = terrainH(x, z - 1) - terrainH(x, z + 1);
-    const n = terrainNormal.set(nx, 2, nz).normalize();
-    const lit = 0.45 + 0.9 * Math.max(0, n.dot(sunFlat));
-    tmp.copy(grassA).lerp(grassB, 0.5 + 0.5 * Math.sin(x * 0.05) * Math.cos(z * 0.07)).multiplyScalar(lit);
-    tmp.r *= 1.25; tmp.g *= 1.05;
-    const dist = Math.hypot(x + 10, z);
-    tmp.lerp(terrainHaze, (1 - Math.exp(-dist / 420)) * 0.92);
-    col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
-  }
-  // trees
-  const tr = rng(5);
-  const cone = new THREE.ConeGeometry(1, 1, 7);
-  cone.translate(0, 0.5, 0);
-  const trunk = 0;
-  const tm = new THREE.InstancedMesh(cone, new THREE.MeshBasicMaterial(), 700);
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), s = new THREE.Vector3(), c = new THREE.Color();
-  const treeHaze = new THREE.Color(0.8, 0.58, 0.5);
-  let k = 0;
-  while (k < 700) {
-    const x = -14 - Math.pow(tr(), 1.6) * 520, z = (tr() - 0.5) * 900;
-    if (x > -45) continue;
-    const ht = 5 + tr() * 9, wd = ht * (0.25 + tr() * 0.1);
-    p.set(x, terrainH(x, z) - 0.5, z); s.set(wd, ht, wd);
-    m4.compose(p, q, s);
-    tm.setMatrixAt(k, m4);
-    const dist = Math.hypot(x + 10, z);
-    c.setRGB(0.16 + tr() * 0.06, 0.2 + tr() * 0.07, 0.1).lerp(treeHaze, (1 - Math.exp(-dist / 300)) * 0.92);
-    tm.setColorAt(k, c);
-    k++;
-  }
-  tm.frustumCulled = false;
-  scene.add(tm);
-}
+// --------------------------------------------------------------- exterior scenery
+const exterior = createExterior({ sunDirection: sunDir });
+scene.add(exterior.group);
 
 // --------------------------------------------------------------- light shafts + dust
 const L = sunDir.clone().negate();
