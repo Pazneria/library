@@ -1,0 +1,53 @@
+{
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "bytes": 4588,
+      "sha256": "808b4c154a8b3995675d03ab04ce6ed8e7b92abb3387cb3befd10f673731c958"
+    },
+    {
+      "path": "src/books.js",
+      "bytes": 7946,
+      "sha256": "ccb8ce418fde19159df8b765d389f7b026ba1310cc93579429a01c9c036f32eb"
+    },
+    {
+      "path": "src/build.js",
+      "bytes": 38605,
+      "sha256": "f412fbf9dae7b82ae2afc0368788ded8ae47a4f557419c2619b8550a0e817fce"
+    },
+    {
+      "path": "src/look.js",
+      "bytes": 4458,
+      "sha256": "59abd9b72b511827f21115f4d10730a010779aa7f8d6f828a316e59122a5745e"
+    },
+    {
+      "path": "src/main.js",
+      "bytes": 18624,
+      "sha256": "e89eb8eb68958dc65fb1974c731bac27966ec6464c140b138791f2abddee479c"
+    },
+    {
+      "path": "src/textures.js",
+      "bytes": 15995,
+      "sha256": "ea0fbea566831426c1354ab2de7c542b7389fb5ba3fabcc9cadec6a76f3aa8be"
+    }
+  ],
+  "buildFiles": [
+    {
+      "path": "docs/.nojekyll",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/assets/index-DhLnrjWo.js",
+      "bytes": 533031,
+      "sha256": "b3666bdac6c2460c0d5f53fbf95271345f7e13680bc527d5205a4719fecc4eca"
+    },
+    {
+      "path": "docs/index.html",
+      "bytes": 4623,
+      "sha256": "a617f01c74320ed9279c00b61a04337212a9e930f5fdb139d0bb2597264f73e8"
+    }
+  ],
+  "base": "/library/",
+  "productionBytes": 537654
+}
