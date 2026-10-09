@@ -115,9 +115,12 @@ for (const mesh of scenes[0].children) { mesh.geometry.dispose(); mesh.material.
 for (const texture of texturesOf(Object.values(baseline.materials))) texture.dispose();
 cases.push('Existing scene teardown finds and disposes every combined merged geometry, material and shared texture once without additional lifecycle or frame hooks');
 
-const protectedPaths = ['index.html', 'src/main.js', 'src/look.js', 'src/loading.js', 'src/books.js', 'src/exit.js', 'src/exit-door.js', 'src/exit-scene.js', 'src/exit-anchor.js', 'src/exit-content.js', 'src/reading.js', 'src/reading-scene.js', 'src/reading-content.js', 'src/room-anchors.js', 'src/jippity-book/hillside.js', 'src/jippity-book/picking.js', 'src/jippity-book/content.json', 'src/exterior/index.js', 'package-lock.json'];
+const host = readFileSync(new URL('src/main.js', root), 'utf8');
+assert.equal(host.split("'./library-books/hillside.js'").length, 2);
+assert.deepEqual(Buffer.from(host.replace("'./library-books/hillside.js'", "'./jippity-book/hillside.js'")), previous('src/main.js'), 'Book adapter import is the only accepted host change since the hinged exit');
+const protectedPaths = ['index.html', 'src/look.js', 'src/loading.js', 'src/books.js', 'src/exit.js', 'src/exit-door.js', 'src/exit-scene.js', 'src/exit-anchor.js', 'src/exit-content.js', 'src/reading.js', 'src/reading-scene.js', 'src/reading-content.js', 'src/room-anchors.js', 'src/jippity-book/hillside.js', 'src/jippity-book/picking.js', 'src/jippity-book/content.json', 'src/exterior/index.js', 'package-lock.json'];
 for (const path of protectedPaths) assert.deepEqual(readFileSync(new URL(path, root)), previous(path), path);
-cases.push('Host frame/input, hinge/threshold, reader/private links, premium book placement, homepage handoff, exterior and lockfile remain byte-identical to the tested hinged-exit base');
+cases.push('Only the accepted reusable-book adapter import changes the host; frame/input, hinge/threshold, legacy reader/private links, original premium asset, homepage handoff, exterior and lockfile remain byte-identical to the tested hinged-exit base');
 console.log(JSON.stringify({ status: 'passed', base, cases, constructionAccounting: {
   baselinePieces: baseline.pieces.length, combinedPieces: combined.pieces.length, retainedPieces: retained, removedPieces: removed, addedPieces: added,
   baselineTriangles: triangles(baseline.pieces), combinedTriangles: triangles(combined.pieces), netTriangles: 74542,

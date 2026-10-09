@@ -10,7 +10,7 @@ The artist modules under `src/reading-chairs`, `src/upstairs-desk`, `src/reading
 
 The two CPU scene loaders resolve the new imports and stub browser-only globe atlas/image creation. The combined test additionally executes the actual globe pixel/drawing program with a command-only CPU canvas and exercises its CanvasTextures through the existing scene teardown. It does not rasterize fonts, decode images or create WebGL.
 
-The reading/book system is unchanged while the separate Sol handoff is pending. Combine that focused handoff here afterward; retain the art preservation/accounting checks and revise only deliberately accepted reading/host byte guards. Do not overwrite an artist module or the full room builder from another branch.
+The separate Sol book handoff is now integrated through one adapter import in `src/main.js`; all original premium book modules and legacy desk/private content remain exact. The art preservation/accounting checks remain active, with that import as the sole accepted host byte difference. `tests/library-books.test.mjs` checks all three copies against this carved room and the final artist geometry. See `RELEASE_REVIEW.md`, `ROOM_GUIDE.md` and `BOOKS_REVIEW.md` for the combined book behavior and maintenance boundaries.
 
 ## Actual combined accounting
 
@@ -26,11 +26,11 @@ Net additions over the hinged-exit room: **74,542 triangles, 16 opaque material 
 
 The static room Builder changes from 55,302 to 129,844 triangles and 28 to 44 merged meshes. These counts exclude separately rendered decorative book instances, premium books, exterior, exit assembly and other host effects. They are CPU construction counts, not measured renderer submissions, GPU allocations or frame-rate results. Shadow culling/pass multiplicity, decoded image copies, canvas backing stores and driver overhead are additional. No new light, animation callback or renderer-quality change is added.
 
-Production output totals **1,784,787 bytes**, versus 624,325 at the hinged-exit base. The main JS is 733,801 bytes; the two emitted rug PNGs total 1,026,403 bytes and exactly match the source PNGs. The existing Vite large-chunk advisory remains.
+Final production output including the book adapter totals **1,794,711 bytes**, versus 624,325 at the hinged-exit base. The main JS is 741,071 bytes; the two emitted rug PNGs total 1,026,403 bytes and exactly match the source PNGs. The existing Vite large-chunk advisory remains.
 
 ## Verification and next QA
 
-All 15 normal CPU/mock-DOM test commands pass, including the five-group combined-art suite and the retained hinged-exit, trim, input, reader, exterior and handoff suites. The normal Vite production build passes. All 51 source entries and six build entries match their manifest sizes/SHA-256 values.
+All 16 normal CPU/mock-DOM test commands pass, including the five-group combined-art suite, the reusable-book placement/history suite and the retained hinged-exit, trim, input, reader, exterior and handoff suites. The normal Vite production build passes. All 60 source entries and six build entries match their manifest sizes/SHA-256 values.
 
 On the actual carved room, 2,291 non-target geometry pieces have exact position/normal/UV/index bytes. Exactly 154 old target pieces are replaced by 445 new pieces. All 134 room collision volumes, 4,711 room RNG draws, decorative book matrices/colors/variants, light/window descriptors and shelf slots remain exact. The paint guard and actual door sweep/walk-through checks pass with the new art. Builder staging geometry and all merged/shared resources dispose once through existing ownership.
 
@@ -45,4 +45,4 @@ No browser, server, native UI or GPU session ran. Library visual QA waits for th
 
 The substantial geometry and texture increase is the main performance risk, especially on constrained graphics/memory. Procedural globe atlas construction may also affect startup; its actual rendered/browser cost is unmeasured. Fine stitches, grain, rug weave and engraved rules may alias at moving or oblique views. Do not claim smooth performance or visual acceptance until the sequential pass establishes it. Preserve the delivered assets for review before making any targeted revision.
 
-The integration worktree and byte-exact handoff copies are retained for the next book/visual pass. No process was started or stopped, and existing preview/server ownership was untouched.
+The integration worktree and byte-exact handoff copies are retained for the sequential visual pass. No browser/server process was started or stopped, and existing preview/server ownership was untouched.

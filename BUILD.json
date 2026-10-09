@@ -161,6 +161,51 @@
       "sha256": "736cb7d32c44884845140f6fa4abcb087d07fa2712f1a606fa95c85c8b667d7c"
     },
     {
+      "path": "src/library-books/catalog.js",
+      "bytes": 779,
+      "sha256": "5e4be00267d5adab0e01dbe08cf1491e3e24d6297572f061a39e6b8198c47e22"
+    },
+    {
+      "path": "src/library-books/collection.js",
+      "bytes": 3921,
+      "sha256": "d63f1e08757b4a1ef309b7d0d365f34fc7c666fc6f0d4d628ce7402aefb72fd2"
+    },
+    {
+      "path": "src/library-books/hillside.js",
+      "bytes": 5612,
+      "sha256": "b2dacf57c5f86f87ebc2d3a7446fc969a3b0b532a025d8e7392749df41182788"
+    },
+    {
+      "path": "src/library-books/inspect.js",
+      "bytes": 3469,
+      "sha256": "4d331044019f482657b61b4b7dde7397b7e1c4d85e7884570b3f5c1e8f254824"
+    },
+    {
+      "path": "src/library-books/library-books.css",
+      "bytes": 2742,
+      "sha256": "3d53192b975269998658987567705d5e8b6e98b8ea0f1d1a219de9dd2a9d00ff"
+    },
+    {
+      "path": "src/library-books/notebook.json",
+      "bytes": 2247,
+      "sha256": "a4cc712a3754f07f4a495561d4360d1a8dced2510e49104a4b2ce1a6f1cb2c1d"
+    },
+    {
+      "path": "src/library-books/placement.js",
+      "bytes": 3972,
+      "sha256": "0fa0520cf5231f4e7f941534665b1821ddfa8f3abd481da55155401ecd70231c"
+    },
+    {
+      "path": "src/library-books/placements.js",
+      "bytes": 987,
+      "sha256": "9b0f87a68fa491c1595a6aebf88c7eec609396d6b3ecd8f78fb818781520d436"
+    },
+    {
+      "path": "src/library-books/welcome.json",
+      "bytes": 1590,
+      "sha256": "36ab66fde4bd042e3fcc5f02505dad95bbdf09e18c0e35a6f8ee5594a2e4be80"
+    },
+    {
       "path": "src/loading.js",
       "bytes": 4609,
       "sha256": "712237a3e21c465ce218fd9f1b3a1d865653abc2e99798ee1df22dd8239e06ca"
@@ -172,8 +217,8 @@
     },
     {
       "path": "src/main.js",
-      "bytes": 20672,
-      "sha256": "2502ce3eeeaf35842247161ad53083f8648dd45d3ce7bd060ea8e9e4920087d2"
+      "bytes": 20673,
+      "sha256": "99d8ca07330690978e0cb89d2c583d30acc4031e2c7aafe406488519bcd2f201"
     },
     {
       "path": "src/reading-chairs/geometry.js",
@@ -263,14 +308,14 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "docs/assets/index-AQJcvoKU.js",
-      "bytes": 733801,
-      "sha256": "1c4b47e6d60a74d4863a4fe375b5bbdff016e82751f33e63d3f43351b3972510"
+      "path": "docs/assets/index-BEw7uotr.js",
+      "bytes": 741071,
+      "sha256": "52ac23041d9abd4702a8ee937b0dc76641135a5e6f174955b4e29bd4f0c8bf45"
     },
     {
-      "path": "docs/assets/index-BCEcn708.css",
-      "bytes": 9444,
-      "sha256": "2ce1bc6f9895acc85c9fc2abc0410b0414da199a1af035e1bc31028d97210d52"
+      "path": "docs/assets/index-DBfS7BKH.css",
+      "bytes": 12098,
+      "sha256": "d5b3ea54f202a26286fdf2329acad7020e1b491a5643e4caea1631288e903825"
     },
     {
       "path": "docs/assets/rug-albedo-DJLqXdw0.png",
@@ -285,9 +330,9 @@
     {
       "path": "docs/index.html",
       "bytes": 15139,
-      "sha256": "163cb548d492c52a7df698f7ea16c12b87484d5076085bef5daec182d037124f"
+      "sha256": "781f520a9251537ae6800157a2d71a51fbb179b541dec8e47ca082c8eb639ec2"
     }
   ],
   "base": "/library/",
-  "productionBytes": 1784787
+  "productionBytes": 1794711
 }

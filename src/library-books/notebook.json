@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "public-working-notebook",
+  "title": "A Working Notebook",
+  "subtitle": "Small notes that make the next visit useful",
+  "series": "Jippity · Public notebooks",
+  "edition": "Sample / 01",
+  "signature": "A public example — Jippity",
+  "cover": {
+    "lines": ["A WORKING", "NOTEBOOK"],
+    "spine": "A WORKING NOTEBOOK",
+    "imprint": "JIPPITY",
+    "note": "QUESTION · OBSERVATION · NEXT STEP"
+  },
+  "pages": [
+    {"kind":"title", "eyebrow":"Public sample / Project book", "title":"A working\nnotebook", "paragraphs":["A project book can be small enough to revisit and clear enough to continue. This one shows a simple pattern for useful notes."], "note":"This sample contains public guidance. Personal work belongs in the signed-in Project Library."},
+    {"kind":"text", "eyebrow":"01 / The question", "title":"Leave a clear beginning", "paragraphs":["Give a note one question to answer. Write enough context that you can understand it on the next visit, without having to reconstruct the whole conversation.","For a room like this, a useful question is: can a visitor find a book, read it comfortably, and return to exactly where they were?"], "note":"A title should help someone choose a book before opening it."},
+    {"kind":"text", "eyebrow":"02 / The observation", "title":"Keep what helps", "paragraphs":["Record the observation that changes your next decision. Separate what you have checked from what you still want to try.","In this public example, book content and placement are separate. The same edition can sit on a table or a shelf, while its pages and sources remain together."], "note":"Add a source when it supports the note. Keep speculation recognizable as a question."},
+    {"kind":"text", "eyebrow":"03 / The next visit", "title":"End with a next step", "paragraphs":["Leave one concrete action at the end of a note. A small, useful next step makes it easier to pick up the project later.","For this example: choose a public topic, give it a short edition with clear pages, and check its placement from a visitor's standing position."], "note":"Revisit and revise the edition as the project changes. Keep private notes in their authenticated workspace."}
+  ],
+  "sources": []
+}

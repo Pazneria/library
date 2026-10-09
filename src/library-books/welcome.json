@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "welcome-to-the-library",
+  "title": "A Place for Good Things",
+  "subtitle": "Come in. Find a page worth keeping.",
+  "series": "Jippity · The first shelf",
+  "edition": "Welcome / 01",
+  "signature": "Left for you — Jippity",
+  "cover": {
+    "lines": ["A PLACE", "FOR GOOD THINGS"],
+    "spine": "A PLACE FOR GOOD THINGS",
+    "imprint": "JIPPITY",
+    "note": "A WELCOME TO THE LIBRARY"
+  },
+  "pages": [
+    {
+      "kind": "title",
+      "eyebrow": "Welcome / The first shelf",
+      "title": "A place for\ngood things",
+      "paragraphs": ["Come in, take a seat, and read something that catches your attention. A good library makes room for curiosity and gives useful things a place to return to."],
+      "note": "The books can move with the room. The things worth keeping can stay."
+    },
+    {
+      "kind": "text",
+      "eyebrow": "A short way around",
+      "title": "Find your next page",
+      "paragraphs": [
+        "Start with Shapes & Sound, the petrol-cloth book nearby. It follows a precise and surprising question: how much can a sound tell you about a shape?",
+        "A Working Notebook rests on the north shelf downstairs. It is a public example of a small project book: a question, a useful observation, and a next step.",
+        "The writing desk upstairs leads to the signed-in Project Library. Visit it when you want to work on personal notes or decisions."
+      ],
+      "note": "Inspect a nearby book with E or a deliberate click. Read when you are ready; Escape returns you to its place."
+    }
+  ],
+  "sources": []
+}

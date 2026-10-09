@@ -9,7 +9,7 @@ import { ROOM_ANCHORS, INTERACTION_REACH } from './room-anchors.js';
 import { addReadingBooks } from './reading-scene.js';
 import { pickAnchor, isEditingTarget } from './interaction-core.js';
 import { installReading } from './reading.js';
-import { addHillsideBooks, installHillsideReading } from './jippity-book/hillside.js';
+import { addHillsideBooks, installHillsideReading } from './library-books/hillside.js';
 import { createFrameLoop } from './frame-loop.js';
 import './reading.css';
 import { EXIT_CONTENT } from './exit-content.js';
