@@ -16,6 +16,11 @@ It remains a draft; the earlier import/fix receipts describe the published base.
 
 ## Controls
 
+Startup uses a dark neutral Library screen with four real construction stages.
+It fades only after the initial authored view is drawn; reduced motion hides it
+immediately. Errors offer an accessible Try again button, including a failed
+module download. Navigation cancels unfinished loading and releases its resources.
+
 Walking is available on arrival, before mouse capture. There is no introductory
 screen to dismiss. Click clear scene space to focus it and capture the mouse; Esc
 releases it and opens a compact controls dialog. Mouse input
@@ -126,13 +131,16 @@ events. They cover sensitivity, pitch, direct camera updates, fallback,
 focus/visibility, pending Escape cancellation and independence from simulated
 render cadence.
 
-All eleven combined CPU suites and the production build passed with Vite's
+All twelve combined CPU suites and the production build passed with Vite's
 existing >500 kB chunk advisory. The premium physical book is 466 triangles and
 one main draw call, adding 452 triangles and one main draw call over the replaced
 marker. Three generated atlases estimate 7,340,032 RGBA bytes with full mipmaps;
 this is construction accounting, not a measured GPU allocation.
-Hardware mouse feel, native pointer-lock behavior, visual acceptance and an FPS
-benchmark remain untested. No claim of higher frame rate is made.
+Background headless Chromium checks exercise native pointer lock, dialog focus,
+history, spreads and Home navigation on the laptop's Intel/ANGLE renderer.
+Captured book, scenery and trim views are available in the separate handoff
+evidence. Hardware mouse feel, physical display tearing and presented frame rate
+remain owner checks. No claim of higher frame rate is made.
 
 Project shelves and a physical private study remain future work. Personal
 notes stay in the existing authenticated Project Library; the desk offers

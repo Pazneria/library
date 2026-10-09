@@ -3,8 +3,10 @@
 This isolated working copy starts from core PR3 commit
 `6d0e838403499635b14cade63cc48e890291f775` and applies the completed exit worker's
 source-only patch, SHA256 `eb80d77c8fe0a3b5723b31bf8b40aca41a138fc9879f269f5e31751625e3d55c`.
-The original core, reading and exit checkouts remain preserved. No merge,
-publication, preview server or browser/GPU/native input session is involved.
+The original core, reading and exit checkouts remain preserved. Source integration
+used CPU checks; final review also uses a bounded headless browser after the parent
+assigned the exclusive graphics slot. No merge, publication or persistent preview
+server is involved, and foreground input is untouched.
 The final review branch also includes the completed frozen exterior and premium
 book. Earlier core-plus-exit and exterior integration commits and receipts remain
 preserved. The PR proposes the complete source with its matching static build.
@@ -69,7 +71,7 @@ geometry/materials, shader texture and instance buffers once. It intentionally
 does not also call `exterior.dispose()` because the host already owns scene GPU
 disposal. The frozen module's standalone disposal test also passes unchanged.
 The recursive public-source check includes nested exterior/book modules and
-retains the privacy boundary. All eleven combined CPU suites and the rebuilt
+retains the privacy boundary. All twelve combined CPU suites and the rebuilt
 static output are recorded in the final handoff receipt.
 
 ## Frozen premium book
@@ -107,6 +109,60 @@ Back/Forward use the existing host pause/capture hooks; no request, credentials,
 private data or persistence API is added. Source links remain deliberate HTTPS
 links. CPU mocks do not establish native focus, history, accessibility or feel.
 
-The parent still holds the graphics slot. No browser/GPU/native input or new
-preview is used for this integration. GLSL compilation, rendered appearance,
-trim/door near-plane inspection and native performance remain untested.
+## Loading and entry transition
+
+The host has a dark neutral `#111318` loading cover, a small Library label, four
+subtle stage segments and a live status. Stages yield for paint before actual
+graphics setup, room construction, scenery and final view preparation. There is
+no simulated percentage, introductory prose or required Enter button. The first
+authored camera draw precedes the 180 ms cover fade; canvas opacity is unchanged.
+Reduced motion removes the fade. Keyboard movement is ready after loading, and
+mouse capture still requires a deliberate scene gesture.
+
+Module-download and WebGL/startup failures show a plain error and Try again.
+Partial startup cancellation and disposal release paint tasks and constructed
+resources; a cached partial startup reloads. Loaded cached pages retain the
+existing focus/page pause behavior. Full exit disposes the loader with its scene.
+All 47 prior source/test files outside `main.js` remain exact, including every
+frozen book and exterior module. The host additions are `loading.js`, loading
+markup/styles/error bootstrap and staged startup/cleanup hooks.
+
+## Native/rendered scope
+
+One background Chromium at a time uses the existing installed test runtime,
+1280x800 CSS/drawing-buffer resolution and DPR/render ratio 1, with the same
+Intel/ANGLE D3D11 renderer, tone mapping and 4096 sun shadow map as published
+baseline `b940eb5`. Native entry walking, deliberate pointer lock, direct mouse
+counts, controls focus, three spreads, Escape, Back/Forward, the welcome/private
+desk link and same-tab Home cleanup are checked without foreground input.
+Loading failure/retry, reduced motion and navigation cancellation receive
+separate cases in the same bounded browser process.
+
+Screenshots cover authored views, nearby alcove beam/trim, the book, narrow reader,
+woodland through three windows and the exit's closest-camera margin. Physical
+display tearing and subjective mouse feel cannot be certified by headless images.
+Cached-Back behavior is CPU-tested; the receipt states whether the browser
+actually used its page cache. Private destinations are never opened.
+
+Matched-view renderer counts and callback timings are evidence, not presented
+FPS. Draw-plus-`gl.finish` JS wall times depend on driver synchronization semantics
+and are not GPU timer measurements. The small cold/warm sample is not a laptop
+performance guarantee. The final receipt records cleanup and explicit release of
+the graphics slot; no other preview/server ownership changes.
+
+The final laptop sample uses Intel Graphics through ANGLE D3D11. Baseline versus
+combined main-pass calls across the five matched authored views are
+`32/43`, `29/38`, `29/39`, `29/39` and `34/50`. New scenery, book and exit increase
+submissions. One cold pair reached the public debug API in 2.24 s / 2.34 s.
+The 90 recorded callback intervals had p95 7.4 ms / 16.6 ms and no sample over
+33 ms; these short headless scheduling samples do not establish presented FPS.
+Warm app callback p95 was 0.8 ms in both. No performance improvement is claimed.
+
+All normal native cases passed and 22 scene/reader screenshots were hashed.
+The browser actually restored the Library from its page cache, then the explicit
+exit reconstruction hook reloaded it. Entry capture left camera, canvas size and
+canvas image exact. Module failure/retry and unavailable-WebGL/reduced-motion
+cases pass. Cancellation uses an explicitly dispatched browser `pagehide` to
+inspect state before subsequent navigation destroys the reporting channel; it
+does not claim a trusted-navigation event trace. Earlier harness failures and
+the production script-ID fix remain recorded in the separate raw evidence.

@@ -19,9 +19,28 @@ import { installLibraryExit } from './exit.js';
 import { disposeLibraryResources } from './exit-resources.js';
 import './exit.css';
 import { createExterior } from './exterior/index.js';
+import { createLoadingScreen } from './loading.js';
+
+const partial = { scene: null, renderer: null, environmentTarget: null, materials: null, cleanup: null };
+let partialDisposed = false;
+function disposeStartup() {
+  if (partialDisposed) return;
+  partialDisposed = true;
+  if (partial.cleanup) partial.cleanup();
+  else if (partial.scene && partial.renderer) disposeLibraryResources({
+    scene: partial.scene, renderer: partial.renderer, environmentTarget: partial.environmentTarget,
+    materials: Object.values(partial.materials || {})
+  });
+  else partial.renderer?.dispose();
+}
+const loadingScreen = createLoadingScreen({ document, window, onCancel: disposeStartup });
+window.__libraryLoading = loadingScreen;
+async function startLibrary() {
+await loadingScreen.stage(0, 'Preparing library');
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+partial.renderer = renderer;
 const MAX_PR = Math.min(window.devicePixelRatio || 1, 1.0);
 let pixelRatio = MAX_PR;
 renderer.setPixelRatio(pixelRatio);
@@ -34,6 +53,7 @@ renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.shadowMap.autoUpdate = false;
 
 const scene = new THREE.Scene();
+partial.scene = scene;
 scene.background = new THREE.Color(0x8a7a6a);
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 2500);
 camera.rotation.order = 'YXZ';
@@ -41,14 +61,17 @@ camera.rotation.order = 'YXZ';
 const pmrem = new THREE.PMREMGenerator(renderer);
 const roomEnvironment = new RoomEnvironment();
 const environmentTarget = pmrem.fromScene(roomEnvironment, 0.04);
+partial.environmentTarget = environmentTarget;
 scene.environment = environmentTarget.texture;
 roomEnvironment.dispose();
 pmrem.dispose();
 scene.environmentIntensity = 0.22;
 
 // --------------------------------------------------------------- build
+await loadingScreen.stage(1, 'Building room');
 const rand = rng(20261006);
 const M = makeMaterials();
+partial.materials = M;
 const books = new BookSet(rng(77));
 const lib = buildLibrary(M, books, rand);
 lib.B.finish(scene);
@@ -61,6 +84,7 @@ const solids = lib.B.solids;
 books.mats.length = books.cols.length = books.vars.length = 0;
 
 // --------------------------------------------------------------- lighting
+await loadingScreen.stage(2, 'Adding scenery');
 const sunDir = new THREE.Vector3(-0.9, 0.4, 0.14).normalize();
 const sun = new THREE.DirectionalLight(0xffb36b, 8.0);
 sun.target.position.set(-2, 3, -1);
@@ -156,6 +180,7 @@ let dustMat;
 }
 
 // --------------------------------------------------------------- player & collision
+await loadingScreen.stage(3, 'Preparing view');
 const P = {
   pos: new THREE.Vector3(), vy: 0, yaw: 0, pitch: 0, eye: 1.62, eyeCur: 1.62, smoothY: 0,
   vel: new THREE.Vector3(), radius: 0.28, step: 0.42, height: 1.75,
@@ -343,7 +368,11 @@ function disposeLibrary() {
   disposeLibraryResources({ scene, renderer, environmentTarget,
     materials: Object.values(M), extraMaterials: [depthMat, ...exitGeometry.materials] });
   delete window.__shafts; delete window.__lib;
+  if (window.__libraryLoading?.state === 'ready') {
+    window.__libraryLoading.dispose(); delete window.__libraryLoading;
+  }
 }
+partial.cleanup = disposeLibrary;
 listen(window, 'blur', () => { releaseMovement(); loop.setPaused('focus', true); });
 listen(window, 'focus', () => loop.setPaused('focus', false));
 listen(document, 'visibilitychange', () => loop.setPaused('visibility', document.visibilityState !== 'visible'));
@@ -362,6 +391,14 @@ drawFrame();
 loop.setPaused('visibility', document.visibilityState !== 'visible');
 loop.setPaused('focus', !document.hasFocus());
 loop.start();
-document.getElementById('loading').classList.add('hide');
 window.__lib = { P, setView, solids, renderer, scene, camera, books: bookMesh, drawFrame, setPrepass: (v) => (usePrepass = v),
   sim: (codes, secs) => { codes.forEach((c) => keys.add(c)); for (let t = 0; t < secs; t += 1 / 60) updatePlayer(1 / 60); codes.forEach((c) => keys.delete(c)); return P.pos.toArray().map((v) => +v.toFixed(2)); } };
+loadingScreen.ready();
+}
+startLibrary().catch(error => {
+  if (error.name !== 'AbortError') {
+    console.error('Library initialization failed:', error);
+    loadingScreen.fail();
+  }
+  disposeStartup();
+});

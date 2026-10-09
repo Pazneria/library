@@ -2,8 +2,8 @@
   "sourceFiles": [
     {
       "path": "index.html",
-      "bytes": 5833,
-      "sha256": "711b8f114d87301006394410d87209ccc5157506b4eb02a432306529c70a52b4"
+      "bytes": 8258,
+      "sha256": "e10e528a504e2b0b7eb69029ca7062675d692fdc7dfcd754ddcb1a5ffd36de0b"
     },
     {
       "path": "src/books.js",
@@ -126,14 +126,19 @@
       "sha256": "736cb7d32c44884845140f6fa4abcb087d07fa2712f1a606fa95c85c8b667d7c"
     },
     {
+      "path": "src/loading.js",
+      "bytes": 3511,
+      "sha256": "b5182634aa93b79e25aba88a290f7eb47bcd3a04551d54d65b8b3d89d8669423"
+    },
+    {
       "path": "src/look.js",
       "bytes": 6223,
       "sha256": "3e0c4d3585c8ec8988e67c96dfab16af4f415a2f751de44da074565ed822ad0b"
     },
     {
       "path": "src/main.js",
-      "bytes": 18510,
-      "sha256": "e95fd7063252c5776e9594146e67cb93c5f806c98403f0d0d67301deb0034904"
+      "bytes": 19923,
+      "sha256": "273efb1e5cfeadbc4d42fae9cc5d59df8a926dc10faa10c7fa28d91b7e3137f2"
     },
     {
       "path": "src/reading-content.js",
@@ -178,16 +183,16 @@
       "sha256": "2ce1bc6f9895acc85c9fc2abc0410b0414da199a1af035e1bc31028d97210d52"
     },
     {
-      "path": "docs/assets/index-CEXttodt.js",
-      "bytes": 593117,
-      "sha256": "5fffcae0d7eb895d466fdbfcc453fb6ad4c12525f2cf39b00d7d101fb995e54d"
+      "path": "docs/assets/index-CeFztUW9.js",
+      "bytes": 595916,
+      "sha256": "d81247dcb8f1e7fae11ab43926e36c6464f67c4d6daa042098bcf6115023a350"
     },
     {
       "path": "docs/index.html",
-      "bytes": 5948,
-      "sha256": "a6917c8301e1b5c5335830d5c3604b6f90e262cf8fad8d98fd3e2bebb45a6eef"
+      "bytes": 8354,
+      "sha256": "731b58156732efe39df5b572e5a03df163d243f2b94214e52b78fa979f7002c1"
     }
   ],
   "base": "/library/",
-  "productionBytes": 608509
+  "productionBytes": 613714
 }

@@ -85,6 +85,11 @@ The originals, frozen proofs, archive, timing and hash receipt remain unchanged.
 All eleven combined CPU suites (73 listed groups/checks plus the complete trim
 SAT audit) and the matching production build pass. This includes actual shared
 book resource disposal and mocked composite look/reader/exit behavior. The final
-draft remains held for joint native/visual review; it is not published or GPU
-benchmarked. CPU software proof images remain part of the separate frozen
+draft then receives the owner's real-stage loading host. Twelve CPU suites now
+pass (80 listed checks plus trim SAT), with all 47 prior source/test files outside
+the documented `main.js` loading hooks unchanged. The parent assigned a separate
+exclusive graphics slot for bounded headless native/rendered review; matched
+baseline counters/timings and screenshots are separate from frozen art evidence.
+No physical presented-FPS claim, merge or publication occurs. CPU software proof
+images remain part of the separate frozen
 delivery and were not copied into the runtime or treated as browser screenshots.
