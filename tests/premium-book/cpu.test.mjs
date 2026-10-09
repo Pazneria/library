@@ -1,0 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { runCPUSuite } from './suite.js';
+import { validateContent } from '../../src/jippity-book/content-validation.js';
+import { createReadingState } from '../../src/jippity-book/reader-state.js';
+import { buildBookGeometry } from '../../src/jippity-book/geometry.js';
+import { pickBook } from '../../src/jippity-book/picking.js';
+import { createBookReader } from '../../src/jippity-book/reader.js';
+import { installBookInteraction } from '../../src/jippity-book/interaction.js';
+const content=JSON.parse(readFileSync(new URL('../../src/jippity-book/content.json',import.meta.url),'utf8'));
+console.log(JSON.stringify(runCPUSuite({validateContent,createReadingState,buildBookGeometry,pickBook,createBookReader,installBookInteraction},content),null,2));

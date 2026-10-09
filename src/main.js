@@ -4,9 +4,43 @@ import { rng, softDot, bookAtlas } from './textures.js';
 import { makeMaterials, buildLibrary, ROOM } from './build.js';
 import { BookSet } from './books.js';
 import { installFpsLook } from './look.js';
+import { READING_CONTENT } from './reading-content.js';
+import { ROOM_ANCHORS, INTERACTION_REACH } from './room-anchors.js';
+import { addReadingBooks } from './reading-scene.js';
+import { pickAnchor, isEditingTarget } from './interaction-core.js';
+import { installReading } from './reading.js';
+import { addHillsideBooks, installHillsideReading } from './jippity-book/hillside.js';
+import { createFrameLoop } from './frame-loop.js';
+import './reading.css';
+import { EXIT_CONTENT } from './exit-content.js';
+import { EXIT_ANCHOR } from './exit-anchor.js';
+import { addLibraryExit } from './exit-scene.js';
+import { installLibraryExit } from './exit.js';
+import { disposeLibraryResources } from './exit-resources.js';
+import './exit.css';
+import { createExterior } from './exterior/index.js';
+import { createLoadingScreen } from './loading.js';
+
+const partial = { scene: null, renderer: null, environmentTarget: null, materials: null, cleanup: null };
+let partialDisposed = false;
+function disposeStartup() {
+  if (partialDisposed) return;
+  partialDisposed = true;
+  if (partial.cleanup) partial.cleanup();
+  else if (partial.scene && partial.renderer) disposeLibraryResources({
+    scene: partial.scene, renderer: partial.renderer, environmentTarget: partial.environmentTarget,
+    materials: Object.values(partial.materials || {})
+  });
+  else partial.renderer?.dispose();
+}
+const loadingScreen = createLoadingScreen({ document, window, onCancel: disposeStartup });
+window.__libraryLoading = loadingScreen;
+async function startLibrary() {
+await loadingScreen.stage(0, 'Preparing library');
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+partial.renderer = renderer;
 const MAX_PR = Math.min(window.devicePixelRatio || 1, 1.0);
 let pixelRatio = MAX_PR;
 renderer.setPixelRatio(pixelRatio);
@@ -19,6 +53,7 @@ renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.shadowMap.autoUpdate = false;
 
 const scene = new THREE.Scene();
+partial.scene = scene;
 scene.background = new THREE.Color(0x8a7a6a);
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 2500);
 camera.rotation.order = 'YXZ';
@@ -26,24 +61,30 @@ camera.rotation.order = 'YXZ';
 const pmrem = new THREE.PMREMGenerator(renderer);
 const roomEnvironment = new RoomEnvironment();
 const environmentTarget = pmrem.fromScene(roomEnvironment, 0.04);
+partial.environmentTarget = environmentTarget;
 scene.environment = environmentTarget.texture;
 roomEnvironment.dispose();
 pmrem.dispose();
 scene.environmentIntensity = 0.22;
 
 // --------------------------------------------------------------- build
+await loadingScreen.stage(1, 'Building room');
 const rand = rng(20261006);
 const M = makeMaterials();
+partial.materials = M;
 const books = new BookSet(rng(77));
 const lib = buildLibrary(M, books, rand);
 lib.B.finish(scene);
 const bookMesh = books.build(bookAtlas(31));
 scene.add(bookMesh);
+const readingBooks = addHillsideBooks(scene, ROOM_ANCHORS, READING_CONTENT, addReadingBooks);
+const exitGeometry = addLibraryExit(scene, M, EXIT_ANCHOR, EXIT_CONTENT);
 const solids = lib.B.solids;
 // Instance buffers now own the uploaded book data. Release construction staging arrays.
 books.mats.length = books.cols.length = books.vars.length = 0;
 
 // --------------------------------------------------------------- lighting
+await loadingScreen.stage(2, 'Adding scenery');
 const sunDir = new THREE.Vector3(-0.9, 0.4, 0.14).normalize();
 const sun = new THREE.DirectionalLight(0xffb36b, 8.0);
 sun.target.position.set(-2, 3, -1);
@@ -73,96 +114,9 @@ for (const l of lib.lights) {
   lamps.push(p);
 }
 
-// --------------------------------------------------------------- sky + hillside backdrop
-const horizon = new THREE.Color(1.0, 0.66, 0.42);
-{
-  const g = new THREE.SphereGeometry(1200, 32, 16);
-  const m = new THREE.ShaderMaterial({
-    side: THREE.BackSide, depthWrite: false,
-    uniforms: { sunDir: { value: sunDir } },
-    vertexShader: `varying vec3 vDir; void main(){ vDir = position; vec4 p = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position = p.xyww; }`,
-    fragmentShader: `uniform vec3 sunDir; varying vec3 vDir;
-      void main(){ vec3 d = normalize(vDir); float h = d.y;
-        vec3 zen = vec3(0.16,0.27,0.55); vec3 hor = vec3(1.25,0.74,0.45); vec3 below = vec3(0.55,0.42,0.36);
-        vec3 col = mix(hor, zen, pow(clamp(h,0.0,1.0), 0.5));
-        col = mix(col, below, smoothstep(0.0,-0.2,h));
-        float s = max(dot(d, sunDir), 0.0);
-        col += vec3(1.0,0.55,0.25)*pow(s,5.0)*0.7 + vec3(1.0,0.75,0.45)*pow(s,90.0)*2.5 + smoothstep(0.9993,0.9996,s)*vec3(18.0,12.0,7.0);
-        gl_FragColor = vec4(col,1.0);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
-      }`,
-  });
-  const sky = new THREE.Mesh(g, m);
-  sky.frustumCulled = false;
-  sky.renderOrder = -1;
-  scene.add(sky);
-}
-function terrainH(x, z) {
-  let h = -0.7;
-  const w = Math.max(0, -x - 13);
-  h -= 70 * (1 - Math.exp(-w / 140));
-  h += (Math.sin(x * 0.011 + z * 0.017) * 10 + Math.sin(z * 0.029 + 1.3) * Math.cos(x * 0.013) * 12) * Math.min(1, w / 120);
-  if (x < -420) h += Math.min(140, (-x - 420) * 0.22) * (0.75 + 0.18 * Math.sin(z * 0.009 + 0.5) + 0.07 * Math.sin(z * 0.043));
-  if (x > 8) h += (x - 8) * 0.35;
-  if (Math.abs(z) > 30 && x > -60) h += (Math.abs(z) - 30) * 0.12;
-  return h;
-}
-{
-  const N = 220, S = 1800;
-  const g = new THREE.PlaneGeometry(S, S, N, N);
-  g.rotateX(-Math.PI / 2);
-  const pos = g.attributes.position;
-  const col = new Float32Array(pos.count * 3);
-  const grassA = new THREE.Color(0.24, 0.27, 0.1), grassB = new THREE.Color(0.34, 0.3, 0.12), tmp = new THREE.Color();
-  const sunFlat = new THREE.Vector3(sunDir.x, sunDir.y, sunDir.z);
-  // Keep the original normal stream; only its discarded colour pass is omitted.
-  for (let i = 0; i < pos.count; i++) pos.setY(i, terrainH(pos.getX(i), pos.getZ(i)));
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  g.computeVertexNormals();
-  const t = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true }));
-  t.position.x = -300;
-  t.matrixAutoUpdate = false; t.updateMatrix();
-  scene.add(t);
-  // Final world-space heights and colours in a single pass.
-  const terrainNormal = new THREE.Vector3();
-  const terrainHaze = new THREE.Color(0.86, 0.6, 0.48);
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i) - 300, z = pos.getZ(i);
-    pos.setY(i, terrainH(x, z));
-    const nx = terrainH(x - 1, z) - terrainH(x + 1, z), nz = terrainH(x, z - 1) - terrainH(x, z + 1);
-    const n = terrainNormal.set(nx, 2, nz).normalize();
-    const lit = 0.45 + 0.9 * Math.max(0, n.dot(sunFlat));
-    tmp.copy(grassA).lerp(grassB, 0.5 + 0.5 * Math.sin(x * 0.05) * Math.cos(z * 0.07)).multiplyScalar(lit);
-    tmp.r *= 1.25; tmp.g *= 1.05;
-    const dist = Math.hypot(x + 10, z);
-    tmp.lerp(terrainHaze, (1 - Math.exp(-dist / 420)) * 0.92);
-    col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
-  }
-  // trees
-  const tr = rng(5);
-  const cone = new THREE.ConeGeometry(1, 1, 7);
-  cone.translate(0, 0.5, 0);
-  const trunk = 0;
-  const tm = new THREE.InstancedMesh(cone, new THREE.MeshBasicMaterial(), 700);
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), s = new THREE.Vector3(), c = new THREE.Color();
-  const treeHaze = new THREE.Color(0.8, 0.58, 0.5);
-  let k = 0;
-  while (k < 700) {
-    const x = -14 - Math.pow(tr(), 1.6) * 520, z = (tr() - 0.5) * 900;
-    if (x > -45) continue;
-    const ht = 5 + tr() * 9, wd = ht * (0.25 + tr() * 0.1);
-    p.set(x, terrainH(x, z) - 0.5, z); s.set(wd, ht, wd);
-    m4.compose(p, q, s);
-    tm.setMatrixAt(k, m4);
-    const dist = Math.hypot(x + 10, z);
-    c.setRGB(0.16 + tr() * 0.06, 0.2 + tr() * 0.07, 0.1).lerp(treeHaze, (1 - Math.exp(-dist / 300)) * 0.92);
-    tm.setColorAt(k, c);
-    k++;
-  }
-  tm.frustumCulled = false;
-  scene.add(tm);
-}
+// --------------------------------------------------------------- exterior scenery
+const exterior = createExterior({ sunDirection: sunDir });
+scene.add(exterior.group);
 
 // --------------------------------------------------------------- light shafts + dust
 const L = sunDir.clone().negate();
@@ -226,6 +180,7 @@ let dustMat;
 }
 
 // --------------------------------------------------------------- player & collision
+await loadingScreen.stage(3, 'Preparing view');
 const P = {
   pos: new THREE.Vector3(), vy: 0, yaw: 0, pitch: 0, eye: 1.62, eyeCur: 1.62, smoothY: 0,
   vel: new THREE.Vector3(), radius: 0.28, step: 0.42, height: 1.75,
@@ -265,8 +220,10 @@ function blocked(x, z, feet, h) {
 
 const keys = new Set();
 let crouch = false;
+let reading = null, loop = null;
+let exit = null, libraryDisposed = false;
 addEventListener('keydown', (e) => {
-  if (e.target?.matches?.('input, button')) return;
+  if (libraryDisposed || reading?.isOpen || loop?.paused || isEditingTarget(e.target)) return;
   keys.add(e.code);
   if (e.repeat) return;
   if (e.code === 'KeyR') setView(0);
@@ -287,8 +244,24 @@ const toastEl = document.getElementById('toast');
 let toastT = 0;
 function toast(s) { toastEl.textContent = s; toastEl.classList.add('show'); toastT = 2.2; }
 
-installFpsLook({ canvas, overlay, player: P, camera, toast,
-  releaseMovement: () => { keys.clear(); P.vel.set(0, 0, 0); },
+function releaseMovement() { keys.clear(); P.vel.set(0, 0, 0); }
+const look = installFpsLook({ canvas, overlay, menuButton: document.getElementById('controls-toggle'), player: P, camera, toast, releaseMovement,
+  isInputBlocked: () => Boolean(libraryDisposed || reading?.isOpen || loop?.paused),
+  setMenuPaused: paused => loop?.setPaused('controls', paused),
+});
+const lookDirection = new THREE.Vector3();
+reading = installHillsideReading({ legacyFactory: installReading, camera, solids, document, window, canvas, content: READING_CONTENT, look, releaseMovement,
+  dialog: document.getElementById('reader'), hint: document.getElementById('interaction-hint'),
+  returnFocus: canvas,
+  canInteract: () => !libraryDisposed && !look.menuOpen && !loop?.paused && document.hasFocus(),
+  getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), ROOM_ANCHORS, solids, INTERACTION_REACH),
+  setPaused: paused => loop?.setPaused('reading', paused)
+});
+exit = installLibraryExit({ document, window, canvas, content: EXIT_CONTENT,
+  controls: overlay.querySelector('.card'), readerFooter: document.querySelector('.reader-footer'),
+  canInteract: () => !libraryDisposed && !reading.isOpen && !look.menuOpen && !loop?.paused && document.hasFocus(),
+  getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), [EXIT_ANCHOR], solids, EXIT_ANCHOR.reach),
+  beforeLeave: disposeLibrary,
 });
 
 const desiredVelocity = new THREE.Vector3();
@@ -347,25 +320,26 @@ function drawFrame() {
   renderer.render(scene, camera);
 }
 const frameTimes = [];
-let statT = 0, last = performance.now(), time = 0;
+let statT = 0, hintT = 0, time = 0;
 setView(0);
+updatePlayer(0); // The initial paused background uses the authored entrance camera.
 toastEl.classList.remove('show');
 renderer.compile(scene, camera);
 // upload every texture now so turning toward a new area never stalls on a first-use upload
 scene.traverse((o) => { const m = o.material; if (!m) return; for (const k of ['map', 'bumpMap']) if (m[k]) renderer.initTexture(m[k]); if (m.uniforms && m.uniforms.map) renderer.initTexture(m.uniforms.map.value); });
 renderer.shadowMap.needsUpdate = true;
 
-function frame(now) {
-  const rawDt = (now - last) / 1000;
-  last = now;
+function frame(now, rawDt) {
   const dt = Math.min(rawDt, 0.05);
   time += dt;
   updatePlayer(dt);
+  hintT += dt;
+  if (hintT >= 0.125) { hintT = 0; reading.updateHint(); exit.updateHint(); }
   for (const l of lamps) if (l.userData.fire) l.intensity = l.userData.i * (0.82 + 0.12 * Math.sin(time * 9.1) + 0.08 * Math.sin(time * 23.7 + 1.3));
   window.__shafts.uniforms.t.value = time;
   dustMat.uniforms.t.value = time;
   drawFrame();
-  if (rawDt < 0.25 && document.visibilityState === 'visible') frameTimes.push(rawDt * 1000);
+  if (rawDt > 0 && rawDt < 0.25 && document.visibilityState === 'visible') frameTimes.push(rawDt * 1000);
   if (frameTimes.length > 240) frameTimes.shift();
   statT += rawDt;
   if (statT > 0.5) {
@@ -378,9 +352,53 @@ function frame(now) {
   }
   // Production quality stays at the selected scale; no automatic resolution reduction.
   if (toastT > 0) { toastT -= dt; if (toastT <= 0) toastEl.classList.remove('show'); }
-  requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
-document.getElementById('loading').classList.add('hide');
+loop = createFrameLoop({ tick: frame, request: callback => window.requestAnimationFrame(callback), cancel: id => window.cancelAnimationFrame(id), now: () => performance.now() });
+const lifecycle = [];
+function listen(target, name, listener) {
+  target.addEventListener(name, listener);
+  lifecycle.push(() => target.removeEventListener(name, listener));
+}
+function disposeLibrary() {
+  if (libraryDisposed) return;
+  libraryDisposed = true;
+  releaseMovement(); look.pause(); loop?.setPaused('exit', true);
+  exit?.dispose(); reading.dispose(); look.dispose(); loop?.dispose();
+  for (const remove of lifecycle) remove();
+  disposeLibraryResources({ scene, renderer, environmentTarget,
+    materials: Object.values(M), extraMaterials: [depthMat, ...exitGeometry.materials] });
+  delete window.__shafts; delete window.__lib;
+  if (window.__libraryLoading?.state === 'ready') {
+    window.__libraryLoading.dispose(); delete window.__libraryLoading;
+  }
+}
+partial.cleanup = disposeLibrary;
+listen(window, 'blur', () => { releaseMovement(); loop.setPaused('focus', true); });
+listen(window, 'focus', () => loop.setPaused('focus', false));
+listen(document, 'visibilitychange', () => loop.setPaused('visibility', document.visibilityState !== 'visible'));
+listen(window, 'pagehide', event => {
+  look.pause(); loop.setPaused('page', true);
+  if (!event.persisted) {
+    disposeLibrary();
+  }
+});
+listen(window, 'pageshow', () => {
+  look.resume(); loop.setPaused('page', false);
+  loop.setPaused('visibility', document.visibilityState !== 'visible');
+  loop.setPaused('focus', !document.hasFocus());
+});
+drawFrame();
+loop.setPaused('visibility', document.visibilityState !== 'visible');
+loop.setPaused('focus', !document.hasFocus());
+loop.start();
 window.__lib = { P, setView, solids, renderer, scene, camera, books: bookMesh, drawFrame, setPrepass: (v) => (usePrepass = v),
   sim: (codes, secs) => { codes.forEach((c) => keys.add(c)); for (let t = 0; t < secs; t += 1 / 60) updatePlayer(1 / 60); codes.forEach((c) => keys.delete(c)); return P.pos.toArray().map((v) => +v.toFixed(2)); } };
+loadingScreen.ready();
+}
+startLibrary().catch(error => {
+  if (error.name !== 'AbortError') {
+    console.error('Library initialization failed:', error);
+    loadingScreen.fail();
+  }
+  disposeStartup();
+});

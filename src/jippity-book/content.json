@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "id": "shapes-and-sound",
+  "title": "Shapes & Sound",
+  "subtitle": "A small study of shared resonances",
+  "series": "Jippity · Field notes",
+  "edition": "No. 01",
+  "signature": "Selected by Jippity",
+  "cover": {
+    "lines": [
+      "SHAPES",
+      "& SOUND"
+    ],
+    "spine": "SHAPES & SOUND",
+    "imprint": "JIPPITY",
+    "note": "ON THE GEOMETRY OF LISTENING"
+  },
+  "pages": [
+    {
+      "kind": "title",
+      "eyebrow": "Mathematics / Acoustics",
+      "title": "Shapes\n& Sound",
+      "paragraphs": [
+        "Different outlines can share the same ideal resonances. A short reading on what a sound can tell us—and what it can leave hidden."
+      ],
+      "note": "An original decorative resonance motif accompanies this text; it is not a diagram of an isospectral pair."
+    },
+    {
+      "kind": "text",
+      "eyebrow": "01 / The question",
+      "title": "Can a sound reveal a shape?",
+      "paragraphs": [
+        "Imagine an ideal, uniformly tensioned drumhead held fixed along its edge. Its natural vibration frequencies form a kind of fingerprint. Could that complete list determine its outline?",
+        "In 1992, Carolyn Gordon, David Webb, and Scott Wolpert announced differently shaped planar domains with the same spectrum. For this mathematical model, the answer is no."
+      ],
+      "sourceIds": [
+        "gww"
+      ]
+    },
+    {
+      "kind": "text",
+      "eyebrow": "02 / The construction",
+      "title": "Rearranging the pieces",
+      "paragraphs": [
+        "Peter Buser, John Conway, Peter Doyle, and Klaus-Dieter Semmler describe pairs assembled from congruent triangles. Their proof moves and combines pieces of vibration patterns from one domain to the other.",
+        "This “transplantation” preserves each eigenvalue and its multiplicity. The boundaries differ, yet the full spectral lists agree."
+      ],
+      "note": "Isospectral means equal spectra, including repeated eigenvalues.",
+      "sourceIds": [
+        "bcds"
+      ]
+    },
+    {
+      "kind": "text",
+      "eyebrow": "03 / A finer distinction",
+      "title": "The same notes are not the whole sound",
+      "paragraphs": [
+        "Matching natural frequencies does not by itself specify how strongly a particular strike excites them.",
+        "Buser and colleagues also give a stronger example: a homophonic pair with special corresponding strike points. In their ideal model, striking at those points excites matching frequencies with matching intensities."
+      ],
+      "sourceIds": [
+        "bcds"
+      ]
+    },
+    {
+      "kind": "text",
+      "eyebrow": "04 / Beyond the ideal",
+      "title": "And what about this room?",
+      "paragraphs": [
+        "The theorem concerns ideal mathematical domains. A real room adds three-dimensional geometry, absorbing surfaces, furnishings, and the positions of both source and listener.",
+        "It does not say that arbitrary differently shaped rooms—or ordinary recordings of real drums—sound identical. The lesson is more precise: even complete spectral information can leave some geometry unresolved."
+      ],
+      "note": "A mathematical possibility, not a room-acoustics simulation.",
+      "sourceIds": [
+        "gww",
+        "bcds"
+      ]
+    },
+    {
+      "kind": "sources",
+      "eyebrow": "Reading desk / Sources",
+      "title": "Follow the proof",
+      "paragraphs": [
+        "Two public papers for a longer visit. Links open only when you choose them."
+      ],
+      "sourceIds": [
+        "gww",
+        "bcds"
+      ],
+      "note": "Public reading sample · No audio simulation"
+    }
+  ],
+  "sources": [
+    {
+      "id": "gww",
+      "authors": "Carolyn Gordon, David L. Webb & Scott Wolpert",
+      "title": "One cannot hear the shape of a drum",
+      "detail": "Research announcement · 1992",
+      "href": "https://arxiv.org/pdf/math/9207215"
+    },
+    {
+      "id": "bcds",
+      "authors": "Peter Buser, John Conway, Peter Doyle & Klaus-Dieter Semmler",
+      "title": "Some planar isospectral domains",
+      "detail": "Version 1.0.1 · 1994",
+      "href": "https://math.dartmouth.edu/~doyle/docs/drum/drum.pdf"
+    }
+  ]
+}

@@ -2,8 +2,8 @@
   "sourceFiles": [
     {
       "path": "index.html",
-      "bytes": 4588,
-      "sha256": "808b4c154a8b3995675d03ab04ce6ed8e7b92abb3387cb3befd10f673731c958"
+      "bytes": 8258,
+      "sha256": "e10e528a504e2b0b7eb69029ca7062675d692fdc7dfcd754ddcb1a5ffd36de0b"
     },
     {
       "path": "src/books.js",
@@ -12,18 +12,158 @@
     },
     {
       "path": "src/build.js",
-      "bytes": 38605,
-      "sha256": "f412fbf9dae7b82ae2afc0368788ded8ae47a4f557419c2619b8550a0e817fce"
+      "bytes": 41403,
+      "sha256": "85005f900c276ae49d1d9fc6a16350ded4fda13dcbc382483ae8e4e201fb951b"
+    },
+    {
+      "path": "src/exit-anchor.js",
+      "bytes": 599,
+      "sha256": "a1585a22312d29edcf3266b31691fd6340ac0f0c95303b58d1eb34c67aab8bca"
+    },
+    {
+      "path": "src/exit-content.js",
+      "bytes": 448,
+      "sha256": "0e1fc0e60a880b9b40d321f27444485a32b4b9f09f384c62ef4f9706281bd08d"
+    },
+    {
+      "path": "src/exit-resources.js",
+      "bytes": 2089,
+      "sha256": "032c48d533b2e028a21c6dee36fc9ba8f9c9a203c33687ce52c60572d42a790b"
+    },
+    {
+      "path": "src/exit-scene.js",
+      "bytes": 3612,
+      "sha256": "ad523c9ec41be0d6ac6643cf2e0cc57b7125ee66cc870ae67eeac0446ff99dc0"
+    },
+    {
+      "path": "src/exit.css",
+      "bytes": 1160,
+      "sha256": "4f33a6701e4194b61f59a5ec64d26e726dbcde5bc623eeb82fe6ae48f885ae6e"
+    },
+    {
+      "path": "src/exit.js",
+      "bytes": 4375,
+      "sha256": "d07e573512d706304625ded03ee02329ba75f0b21e7e5cd92659d20e3b8dcbc9"
+    },
+    {
+      "path": "src/exterior/assets.js",
+      "bytes": 11032,
+      "sha256": "70c157be0e142227da61482962e3ee705764284a05992b83f88fa7236f3c24c5"
+    },
+    {
+      "path": "src/exterior/index.js",
+      "bytes": 7691,
+      "sha256": "694b9c110b291b47dd8fc614cd97d456dc9783f482cb1f92fd1fd4c194228c9c"
+    },
+    {
+      "path": "src/exterior/layout.js",
+      "bytes": 4854,
+      "sha256": "b3e0b2f094b3d53ca4d1f0d75c7b6edf09ef65d2595d8df6c5121a9b4612fcf2"
+    },
+    {
+      "path": "src/frame-loop.js",
+      "bytes": 987,
+      "sha256": "ebbfc7d05de9ca486f41b74cce2d2b61ce25dac1882c30e754ab499881623295"
+    },
+    {
+      "path": "src/interaction-core.js",
+      "bytes": 1757,
+      "sha256": "d9854682bbc2b56e2cdc6ff155b78c429032ef6f83543588cf39674b0e7f542a"
+    },
+    {
+      "path": "src/jippity-book/atlas.js",
+      "bytes": 4440,
+      "sha256": "ea088117c38b35764ecc58ddf970de23aaa7b0a41886abc855760ba22204b4f1"
+    },
+    {
+      "path": "src/jippity-book/book.js",
+      "bytes": 2563,
+      "sha256": "dd41499cb07a0f1263cc9e7daa0564c55ed514d902e5879ca8472af0dda1d7dd"
+    },
+    {
+      "path": "src/jippity-book/content-validation.js",
+      "bytes": 1896,
+      "sha256": "3f0a95b89c7fee9720912cb2994cc248f326c57690b052b9651ac3e631b5f85e"
+    },
+    {
+      "path": "src/jippity-book/content.json",
+      "bytes": 4179,
+      "sha256": "f5e31b6489c40157a3983ba06e0b51ec66d1f026052c1f1405e82476e442046b"
+    },
+    {
+      "path": "src/jippity-book/geometry.js",
+      "bytes": 4943,
+      "sha256": "957d7c8f1041057a1fe8ba6e30dbb9c01a69f02b754921913bb315ba36b17816"
+    },
+    {
+      "path": "src/jippity-book/hillside.js",
+      "bytes": 3062,
+      "sha256": "33c12ba0e6ba9a1eddcf7fedacf97b3616d99b450b344d47bc3896291fd49d1d"
+    },
+    {
+      "path": "src/jippity-book/interaction.js",
+      "bytes": 2674,
+      "sha256": "95a173fecc8e9d43958212f26fb6f58ce1d7045d95ee56bac2c384f858f5e826"
+    },
+    {
+      "path": "src/jippity-book/picking.js",
+      "bytes": 1931,
+      "sha256": "7499539c1cbae2249fb09443a4f6ca9dfbaf880ff88b321fba1543ea3f4f2a81"
+    },
+    {
+      "path": "src/jippity-book/reader-state.js",
+      "bytes": 808,
+      "sha256": "68e3523c78056a50c653d79dda83d25b9ee83c98b5e10285ad10567995c41633"
+    },
+    {
+      "path": "src/jippity-book/reader.css",
+      "bytes": 6786,
+      "sha256": "82b773776f3b6b0b7d5ec5dc4b06532d288dbc2c07e51ac8448e2b8722562a96"
+    },
+    {
+      "path": "src/jippity-book/reader.js",
+      "bytes": 10047,
+      "sha256": "736cb7d32c44884845140f6fa4abcb087d07fa2712f1a606fa95c85c8b667d7c"
+    },
+    {
+      "path": "src/loading.js",
+      "bytes": 3511,
+      "sha256": "b5182634aa93b79e25aba88a290f7eb47bcd3a04551d54d65b8b3d89d8669423"
     },
     {
       "path": "src/look.js",
-      "bytes": 4458,
-      "sha256": "59abd9b72b511827f21115f4d10730a010779aa7f8d6f828a316e59122a5745e"
+      "bytes": 6223,
+      "sha256": "3e0c4d3585c8ec8988e67c96dfab16af4f415a2f751de44da074565ed822ad0b"
     },
     {
       "path": "src/main.js",
-      "bytes": 18624,
-      "sha256": "e89eb8eb68958dc65fb1974c731bac27966ec6464c140b138791f2abddee479c"
+      "bytes": 19923,
+      "sha256": "273efb1e5cfeadbc4d42fae9cc5d59df8a926dc10faa10c7fa28d91b7e3137f2"
+    },
+    {
+      "path": "src/reading-content.js",
+      "bytes": 3059,
+      "sha256": "9a349a1687f8ea3581b443eb4e55b06189bed25e4f04db69dea958dde90749ba"
+    },
+    {
+      "path": "src/reading-scene.js",
+      "bytes": 3349,
+      "sha256": "2728a8ccf52d7828d6a5a958a9a738770e8d52b40fbdac0d04bd38fe74c17369"
+    },
+    {
+      "path": "src/reading.css",
+      "bytes": 2272,
+      "sha256": "3caa38e5897d0f0dc611d674e13e0534f8969c5ff9b05bd14d2e9737c5e76234"
+    },
+    {
+      "path": "src/reading.js",
+      "bytes": 4708,
+      "sha256": "6c947b8db23208cd5a84571e6c058a3bffa37fa7b0eff09b4d40008530f3d74b"
+    },
+    {
+      "path": "src/room-anchors.js",
+      "bytes": 835,
+      "sha256": "9ce10dc196c7602771ffbc87a7052830314b27e59a915dcd78669acbe2c3ec76"
     },
     {
       "path": "src/textures.js",
@@ -38,16 +178,21 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "docs/assets/index-DhLnrjWo.js",
-      "bytes": 533031,
-      "sha256": "b3666bdac6c2460c0d5f53fbf95271345f7e13680bc527d5205a4719fecc4eca"
+      "path": "docs/assets/index-BCEcn708.css",
+      "bytes": 9444,
+      "sha256": "2ce1bc6f9895acc85c9fc2abc0410b0414da199a1af035e1bc31028d97210d52"
+    },
+    {
+      "path": "docs/assets/index-CeFztUW9.js",
+      "bytes": 595916,
+      "sha256": "d81247dcb8f1e7fae11ab43926e36c6464f67c4d6daa042098bcf6115023a350"
     },
     {
       "path": "docs/index.html",
-      "bytes": 4623,
-      "sha256": "a617f01c74320ed9279c00b61a04337212a9e930f5fdb139d0bb2597264f73e8"
+      "bytes": 8354,
+      "sha256": "731b58156732efe39df5b572e5a03df163d243f2b94214e52b78fa979f7002c1"
     }
   ],
   "base": "/library/",
-  "productionBytes": 537654
+  "productionBytes": 613714
 }

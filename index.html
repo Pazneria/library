@@ -5,11 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Hillside Library</title>
 <style>
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #16110d; font-family: Georgia, 'Times New Roman', serif; color: #f1e6d2; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #111318; font-family: Georgia, 'Times New Roman', serif; color: #f1e6d2; }
   #c { display: block; width: 100vw; height: 100vh; }
   #vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(20,10,0,0.38) 100%); }
-  #overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(18,12,8,0.55); cursor: pointer; transition: opacity .3s; }
-  #overlay.hide { opacity: 0; pointer-events: none; }
+  #overlay { max-width: min(460px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border: 0; background: transparent; color: inherit; }
+  #overlay::backdrop { background: rgba(18,12,8,0.55); }
+  #controls-toggle { position: fixed; top: 12px; left: 14px; padding: 7px 10px; background: rgba(20,12,6,0.65); border: 1px solid #8a7250; border-radius: 4px; color: #e5d7bf; font: 12px system-ui, sans-serif; cursor: pointer; }
+  .reading-open #controls-toggle { visibility: hidden; }
+  button:focus-visible, #c:focus-visible { outline: 2px solid #d6aa64; outline-offset: 3px; }
   .card { max-width: 460px; padding: 28px 34px; background: rgba(30,20,14,0.88); border: 1px solid rgba(214,170,100,0.45); border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
   .card h1 { margin: 0 0 4px; font-weight: normal; font-size: 30px; letter-spacing: .5px; color: #f4dcae; }
   .card p { margin: 6px 0 16px; color: #cdb998; font-style: italic; }
@@ -27,26 +30,40 @@
   #cross { position: fixed; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%; background: rgba(255,240,220,0.65); pointer-events: none; }
   #toast { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); padding: 6px 14px; background: rgba(25,15,8,0.7); border-radius: 4px; font-size: 15px; opacity: 0; transition: opacity .4s; pointer-events: none; color: #f4dcae; }
   #toast.show { opacity: 1; }
-  #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #16110d; color: #cdb998; font-style: italic; font-size: 18px; }
-  #loading.hide { display: none; }
+  #loading { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: #111318; color: #e5e7eb; opacity: 1; transition: opacity 180ms ease; font: 12px system-ui, sans-serif; }
+  #loading[hidden] { display: none; }
+  #loading.is-ready { opacity: 0; pointer-events: none; }
+  .loading-content { width: min(240px, calc(100vw - 48px)); text-align: center; }
+  .loading-name { margin: 0 0 20px; font-size: 13px; font-weight: 500; letter-spacing: .18em; }
+  .loading-progress { display: flex; gap: 4px; margin: 0 auto 14px; width: 112px; }
+  .loading-progress i { flex: 1; height: 2px; background: #343944; }
+  #loading[data-stage="1"] .loading-progress i:nth-child(1),
+  #loading[data-stage="2"] .loading-progress i:nth-child(-n+2),
+  #loading[data-stage="3"] .loading-progress i:nth-child(-n+3),
+  #loading[data-stage="4"] .loading-progress i { background: #b4bdce; }
+  #loading-status { margin: 0; color: #98a1b1; font-size: 11px; }
+  #loading-error { color: #c5cbd5; font-size: 12px; line-height: 1.5; }
+  #loading-retry { margin-top: 12px; padding: 8px 16px; color: #e5e7eb; border: 1px solid #596170; background: #1b1f27; border-radius: 4px; font: inherit; cursor: pointer; }
+  @media (prefers-reduced-motion: reduce) { #loading { transition: none; } }
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+<canvas id="c" tabindex="0" aria-label="Walkable Hillside Library"></canvas>
 <div id="vignette"></div>
 <div id="cross"></div>
 <div id="toast"></div>
 <div id="stats"></div>
-<div id="help">WASD move · Mouse look · Shift run · C crouch · 1–5 viewpoints · R reset · F frame stats · H hide</div>
-<div id="overlay">
+<div id="help" class="hide">WASD move · Click for mouse look · Esc controls · E read · Shift run</div>
+<button id="controls-toggle" type="button" aria-haspopup="dialog" aria-controls="overlay">Controls · Esc</button>
+<dialog id="overlay" aria-labelledby="controls-title">
   <div class="card">
-    <h1>The Hillside Library</h1>
-    <p>Late afternoon. The reading room is quiet.</p>
+    <h1 id="controls-title">Controls</h1>
     <table>
       <tr><td>Mouse</td><td>FPS look (click to capture; Esc opens controls)</td></tr>
       <tr><td>W A S D / Arrows</td><td>Walk</td></tr>
       <tr><td>Shift</td><td>Walk faster</td></tr>
       <tr><td>C</td><td>Crouch toggle (browse low shelves)</td></tr>
+      <tr><td>E / click</td><td>Read a nearby book or the writing desk</td></tr>
       <tr><td>1 – 5</td><td>Hearth · Stacks · Alcove · Stair foot · Gallery</td></tr>
       <tr><td>R</td><td>Reset to the entrance view</td></tr>
       <tr><td>F</td><td>Frame-time / FPS overlay</td></tr>
@@ -57,10 +74,54 @@
       <input id="look-sensitivity" type="range" min="40" max="220" step="5" value="100" aria-label="Mouse sensitivity" />
       <output id="look-sensitivity-value" for="look-sensitivity">100%</output>
     </label>
-    <button class="go" type="button">Click to enter</button>
+    <button class="go" type="button" data-resume-look>Return to room</button>
+  </div>
+</dialog>
+<div id="loading" data-stage="0" aria-busy="true">
+  <div class="loading-content">
+    <p class="loading-name">LIBRARY</p>
+    <div class="loading-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <p id="loading-status" role="status" aria-live="polite">Preparing library</p>
+    <p id="loading-error" role="alert" hidden>Try again to reload the scene.</p>
+    <button id="loading-retry" type="button" hidden>Try again</button>
+    <noscript><p>JavaScript is needed to open the Library.</p></noscript>
   </div>
 </div>
-<div id="loading">Shelving the books…</div>
-<script type="module" src="/src/main.js"></script>
+<button id="interaction-hint" type="button" hidden></button>
+<dialog id="reader" aria-labelledby="reader-title" aria-describedby="reader-kicker">
+  <div class="reader-shell">
+    <div class="reader-heading">
+      <p id="reader-kicker"></p>
+      <button id="reader-close" type="button" aria-label="Back to room">×</button>
+    </div>
+    <h2 id="reader-title" tabindex="-1"></h2>
+    <div id="reader-pages"></div>
+    <nav id="reader-links" aria-label="Reading links"></nav>
+    <div class="reader-footer">
+      <span id="reader-signature"></span>
+      <button id="reader-back" type="button">Back to room</button>
+    </div>
+  </div>
+</dialog>
+<script>
+  (() => {
+    const retry = document.getElementById('loading-retry');
+    const reload = () => location.reload();
+    const failed = event => {
+      if (event.target !== window && !(event.target.tagName === 'SCRIPT' && event.target.type === 'module')) return;
+      document.getElementById('loading').setAttribute('aria-busy', 'false');
+      document.getElementById('loading-status').textContent = 'Library could not load.';
+      document.getElementById('loading-error').hidden = retry.hidden = false;
+    };
+    window.addEventListener('error', failed, true);
+    retry.addEventListener('click', reload);
+    window.__libraryBootErrorCleanup = () => {
+      window.removeEventListener('error', failed, true);
+      retry.removeEventListener('click', reload);
+      delete window.__libraryBootErrorCleanup;
+    };
+  })();
+</script>
+<script id="library-entry" type="module" src="/src/main.js"></script>
 </body>
 </html>
