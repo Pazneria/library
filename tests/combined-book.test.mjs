@@ -14,9 +14,11 @@ import { disposeLibraryResources } from '../src/exit-resources.js';
 import { createBookReader } from '../src/jippity-book/reader.js';
 import { makeTestHarness } from './premium-book/harness.js';
 import { loadRoom } from './load-room.mjs';
+import { EXIT_PORTAL } from '../src/exit-anchor.js';
+import { addQueries } from './library-books-harness.mjs';
 
 const require = createRequire(import.meta.url), esbuild = require('esbuild');
-const bundled = await esbuild.build({entryPoints:[fileURLToPath(new URL('../src/jippity-book/hillside.js',import.meta.url))],
+const bundled = await esbuild.build({entryPoints:[fileURLToPath(new URL('../src/library-books/hillside.js',import.meta.url))],
   bundle:true,write:false,platform:'node',format:'cjs',external:['three'],loader:{'.css':'empty'},logLevel:'silent'});
 esbuild.stop();
 const module = {exports:{}};
@@ -32,21 +34,20 @@ try { books = addHillsideBooks(scene,ROOM_ANCHORS,READING_CONTENT,addReadingBook
 finally { globalThis.document = originalDocument; }
 scene.updateMatrixWorld(true);
 assert.equal(books.objects.length,3);
-assert.equal(scene.getObjectByName('Jippity reading books').count,1);
+assert.equal(scene.getObjectByName('Jippity reading books'),undefined);
 assert.equal(scene.children.filter(object=>object===books.book.object).length,1);
 assert.ok(books.book.object.name.endsWith(content.title));
 const premiumBox = new THREE.Box3().setFromObject(books.book.object);
-const welcome = scene.getObjectByName('Jippity reading books'), matrix = new THREE.Matrix4();
-welcome.getMatrixAt(0,matrix);
-const welcomeBox = new THREE.Box3(new THREE.Vector3(-.5,-.5,-.5),new THREE.Vector3(.5,.5,.5)).applyMatrix4(matrix);
+const welcome = books.books.find(book=>book.placement.contentId==='welcome');
+const welcomeBox = new THREE.Box3().setFromObject(welcome.object);
 assert.equal(premiumBox.intersectsBox(welcomeBox),false);
-const room = await loadRoom();
+const room = await loadRoom(EXIT_PORTAL);
 const penetrates = (a,b)=>['x','y','z'].every(axis=>Math.min(a.max[axis],b.max[axis])-Math.max(a.min[axis],b.min[axis])>.0008);
 assert.ok(!room.pieces.some(piece=>penetrates(premiumBox,piece)));
-assert.equal(books.book.budget.triangles,466);
-cases.push('Actual adapter replaces the drum marker: one premium book plus one welcome book; no duplicate/overlapping book or room furniture');
+assert.equal(books.budget.triangles,1398);
+cases.push('Actual adapter uses three bound books with shared geometry/masks; welcome and existing reading remain clear of each other and furniture');
 
-const h = makeTestHarness({createBookReader},content); h.reader.dispose();
+const h = addQueries(makeTestHarness({createBookReader},content)); h.reader.dispose();
 h.doc.hasFocus = ()=>true;
 h.doc.exitPointerLock = ()=>{h.doc.pointerLockElement=null;h.doc.emit('pointerlockchange');};
 h.canvas.getBoundingClientRect = ()=>({left:0,top:0,width:640,height:480});
@@ -90,16 +91,19 @@ premiumDialog().emit('cancel');h.flushPop();h.flushClose();
 assert.ok(!reading.isOpen&&!paused);assert.equal(h.doc.activeElement,h.canvas);assert.equal(captureRequests,1);
 cases.push('Real core look and premium interaction coexist: scene capture remains deliberate, mouse counts apply immediately, book click releases capture and close returns canvas focus without recapture');
 
-aimAway();legacyTarget=ROOM_ANCHORS.find(anchor=>anchor.id==='table-welcome');
+camera.lookAt(-.35,.814,3.53);camera.updateMatrixWorld(true);
+legacyTarget=ROOM_ANCHORS.find(anchor=>anchor.id==='table-welcome');
 h.win.emit('keydown',{code:'KeyE'});
-assert.ok(reading.isOpen&&legacyDialog.open&&paused);assert.equal(premiumDialog().open,false);
-legacyDialog.emit('cancel');h.flushPop();h.flushClose();
+assert.ok(reading.isOpen&&!legacyDialog.open&&paused);
+const welcomeDialog=h.all.find(element=>element.open&&element.className==='jb-reader');
+assert.equal(welcomeDialog.getAttribute('aria-label'),'A Place for Good Things');
+welcomeDialog.emit('cancel');h.flushPop();h.flushClose();aimAway();
 legacyTarget=ROOM_ANCHORS.find(anchor=>anchor.id==='gallery-writing-desk');
 h.win.emit('keydown',{code:'KeyE'});
 assert.ok(legacyDialog.open&&reading.isOpen);
 assert.equal(legacyElements.get('#reader-links').children[0].href,'https://jippity-project-room.pazneria.chatgpt.site');
 legacyDialog.emit('cancel');h.flushPop();h.flushClose();
-cases.push('Actual legacy welcome and private desk readers remain reachable and mutually exclusive with the premium reader; private entrance stays a deliberate external link');
+cases.push('Welcome now opens the shared premium reader; existing private desk remains reachable, mutually exclusive and a deliberate external link');
 
 const resources = new Set();
 scene.traverse(object=>{if(object.geometry)resources.add(object.geometry);if(object.isInstancedMesh)resources.add(object);
@@ -131,6 +135,6 @@ assert.match(main,/installHillsideReading\(\{ legacyFactory: installReading, cam
 assert.ok(!/readingBooks\.dispose\s*\(/.test(main));
 assert.match(main,/reading\.dispose\(\); look\.dispose\(\); loop\?\.dispose\(\)/);
 cases.push('Main retains the three documented book hooks and single host GPU cleanup owner; composite reader disposal precedes scene disposal');
-console.log(JSON.stringify({status:'passed',cases,premiumBudget:books.book.budget,
-  combinedReadingGeometry:{triangles:480,mainDrawCalls:3,incrementalTriangles:452,incrementalMainDrawCalls:1},
+console.log(JSON.stringify({status:'passed',cases,premiumBudget:books.budget,
+  combinedReadingGeometry:{triangles:1398,mainDrawCalls:3,incrementalTriangles:918,incrementalMainDrawCalls:0},
   roomPiecesChecked:room.pieces.length,scope:'CPU actual copied book adapter, core look, legacy reader and exit with mock DOM/history/canvas; no GPU/browser/native input'},null,2));

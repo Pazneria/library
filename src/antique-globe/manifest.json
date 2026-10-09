@@ -1,0 +1,187 @@
+{
+  "name": "Orbis Terrarum — Library globe",
+  "version": 1,
+  "repository": "https://github.com/Pazneria/library",
+  "baseCommit": "f47874c78844936ee048cf45b81cf3827f5b35b7",
+  "placement": {
+    "location": [
+      -5.9,
+      0,
+      -0.7
+    ],
+    "yaw": 0.3,
+    "existingCollisionUnchanged": true,
+    "localBounds": [
+      [
+        -0.34599998593330383,
+        0.0010000000474974513,
+        -0.34599998593330383
+      ],
+      [
+        0.34599998593330383,
+        1.3274999856948853,
+        0.35199999809265137
+      ]
+    ]
+  },
+  "geometry": {
+    "triangles": 14548,
+    "vertices": 9818,
+    "geometryBytes": 401464,
+    "pieces": 37,
+    "byMaterial": [
+      {
+        "key": "globe",
+        "pieces": 1,
+        "triangles": 4992,
+        "vertices": 2665,
+        "geometryBytes": 115232,
+        "indexType": "Uint16Array"
+      },
+      {
+        "key": "globeWalnut",
+        "pieces": 8,
+        "triangles": 3384,
+        "vertices": 2492,
+        "geometryBytes": 100048,
+        "indexType": "Uint16Array"
+      },
+      {
+        "key": "globeBrass",
+        "pieces": 25,
+        "triangles": 5596,
+        "vertices": 4079,
+        "geometryBytes": 164104,
+        "indexType": "Uint16Array"
+      },
+      {
+        "key": "globeScales",
+        "pieces": 3,
+        "triangles": 576,
+        "vertices": 582,
+        "geometryBytes": 22080,
+        "indexType": "Uint16Array"
+      }
+    ],
+    "degenerateTriangles": 0,
+    "reversedTriangles": 0
+  },
+  "baselineGlobe": {
+    "triangles": 2020,
+    "vertices": 1227,
+    "geometryBytes": 51384,
+    "replacedPieces": 6,
+    "addedTriangles": 12528,
+    "addedVertices": 8591,
+    "addedGeometryBytes": 350080
+  },
+  "draws": {
+    "mainPass": 4,
+    "netRoomMainPass": 3,
+    "possibleDepthPrepass": 4,
+    "possibleShadowPass": 4,
+    "measured": false
+  },
+  "materials": 4,
+  "textures": [
+    {
+      "name": "map",
+      "dimensions": [
+        2048,
+        1024
+      ],
+      "rgbaBaseBytes": 8388608,
+      "rgbaMipBytes": 11184812
+    },
+    {
+      "name": "walnut",
+      "dimensions": [
+        256,
+        512
+      ],
+      "rgbaBaseBytes": 524288,
+      "rgbaMipBytes": 699052
+    },
+    {
+      "name": "scales",
+      "dimensions": [
+        1024,
+        256
+      ],
+      "rgbaBaseBytes": 1048576,
+      "rgbaMipBytes": 1398108
+    }
+  ],
+  "totalTextureRGBAWithMips": 13281972,
+  "oldTextureRGBAWithMips": 699052,
+  "textureRGBAMipDelta": 12582920,
+  "runtimeFiles": [
+    {
+      "path": "src/antique-globe/atlas.js",
+      "bytes": 9764,
+      "sha256": "23b83e8dda1aa9aa18ae67ceda9b24f3cda1d97bc5e773dfb578622d76a53b75"
+    },
+    {
+      "path": "src/antique-globe/geometry.js",
+      "bytes": 9592,
+      "sha256": "de69b3617e4b89db468a0f4ddc20629ce8fdf5b225932faabcad3ab19145a9d3"
+    },
+    {
+      "path": "src/antique-globe/land.js",
+      "bytes": 86341,
+      "sha256": "57936873c445cb23787915377309851da5af869c7f1c1947ecf3e8816af098e5"
+    }
+  ],
+  "sourceBytes": 105697,
+  "networkRequests": 0,
+  "frameCallbacks": 0,
+  "listeners": 0,
+  "addedLights": 0,
+  "preserved": {
+    "collisionBoxes": 132,
+    "nonGlobeGeometryPieces": 2435,
+    "lights": true,
+    "windows": true,
+    "books": true,
+    "slots": true
+  },
+  "checks": {
+    "globeCPU": "passed",
+    "repositoryCPUCommands": 13,
+    "repositoryCPU": "passed",
+    "productionBuild": "passed",
+    "buildWarning": "Existing >500 kB chunk advisory"
+  },
+  "sourceEdits": [
+    "src/build.js",
+    "tests/load-room.mjs",
+    "tests/load-geometry.mjs"
+  ],
+  "untouched": [
+    "src/main.js",
+    "lighting",
+    "other scene geometry",
+    "camera",
+    "collision boxes",
+    "reading content",
+    "auth links",
+    "exit implementation",
+    "homepage handoff",
+    "frozen originals",
+    "docs/",
+    "BUILD.json",
+    "package.json",
+    "package-lock.json"
+  ],
+  "untested": [
+    "Browser rendering",
+    "Font rasterization",
+    "Native UI",
+    "GPU allocation",
+    "Presented FPS",
+    "Lighting appearance",
+    "Normal/close-distance visual quality"
+  ],
+  "provenance": "PROVENANCE.md",
+  "timingAndCleanup": "../../globe-handoff/WORK_LOG.md"
+}

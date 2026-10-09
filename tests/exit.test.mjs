@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import * as THREE from 'three';
 import { EXIT_CONTENT } from '../src/exit-content.js';
-import { EXIT_ANCHOR } from '../src/exit-anchor.js';
+import { EXIT_ANCHOR, EXIT_PORTAL } from '../src/exit-anchor.js';
 import { addLibraryExit } from '../src/exit-scene.js';
 import { installLibraryExit } from '../src/exit.js';
 import { disposeLibraryResources } from '../src/exit-resources.js';
@@ -38,7 +38,7 @@ class Element extends Events {
   removeAttribute(name) { this.attributes.delete(name); }
   closest(selector) { return selector.split(',').map(part => part.trim()).includes(this.tag) ? this : null; }
 }
-function harness({ cleanupThrows = false } = {}) {
+function harness({ cleanupThrows = false, useDoor = () => true } = {}) {
   const win = new Events(), doc = new Events(), canvas = new Element('canvas');
   doc.body = new Element('body'); doc.createElement = tag => new Element(tag);
   doc.pointerLockElement = null;
@@ -52,7 +52,7 @@ function harness({ cleanupThrows = false } = {}) {
   loop.start();
   canvas.setAttribute('aria-describedby', 'existing-description');
   const api = installLibraryExit({ document: doc, window: win, canvas, controls, readerFooter: footer,
-    content: EXIT_CONTENT, getTarget: () => target, canInteract: () => available,
+    content: EXIT_CONTENT, getTarget: () => target, canInteract: () => available, useDoor,
     beforeLeave: () => {
       order.push('stop'); loop.setPaused('exit', true); loop.dispose();
       order.push('cancel-input'); disposalCount++;
@@ -127,6 +127,14 @@ h.canvas.emit('mousedown', { button: 0, clientX: 20, clientY: 20 }); h.canvas.em
 assert.equal(h.destinations.length, 1);
 cases.push('Deliberate door click only; unlocked/locked drag, capture transition, blur and stray click do not leave');
 
+let opened = false;
+h = harness({useDoor:()=>opened}); h.win.emit('keydown',{code:'KeyE',target:h.canvas});
+assert.equal(h.destinations.length,0);
+h.canvas.emit('mousedown',{button:0,clientX:20,clientY:20});h.canvas.emit('click',{button:0});assert.equal(h.destinations.length,0);
+opened=true;h.win.emit('keydown',{code:'KeyE',target:h.canvas});assert.equal(h.destinations.length,1);h.api.leave();assert.equal(h.destinations.length,1);
+h=harness({useDoor:()=>false});h.controls.children[0].emit('click');assert.equal(h.destinations.length,1);
+cases.push('Room E/click opens without queuing navigation; a later deliberate use can leave once open; manual controls link remains immediate and idempotent');
+
 h = harness({ cleanupThrows: true }); assert.throws(() => h.api.leave()); assert.equal(h.destinations.length, 1);
 cases.push('Navigation remains available if host teardown reports an error');
 
@@ -167,25 +175,27 @@ assert.equal(host.window.__shafts, undefined); assert.equal(host.window.__lib, u
 assert.match(mainSource, /beforeLeave: disposeLibrary/);
 cases.push('Actual main.js exit hook tears down movement/look/reader/frame loop/listeners/resources once and removes debug roots');
 
-const room = await loadRoom();
+const room = await loadRoom(EXIT_PORTAL);
 const solidsBefore = JSON.stringify(room.solids);
 const exitScene = new THREE.Scene(), exitParts = [];
-const originalAdd = Builder.prototype.add;
-Builder.prototype.add = function(material, geometry) { geometry.computeBoundingBox(); exitParts.push(geometry.boundingBox.clone()); originalAdd.call(this, material, geometry); };
-const materials = Object.fromEntries(['oak', 'dark', 'brass'].map(name => [name, new THREE.MeshStandardMaterial()]));
+const originalAdd = Builder.prototype.add, originalFinish = Builder.prototype.finish;
+Builder.prototype.add = function(material, geometry) { geometry.computeBoundingBox(); exitParts.push({builder:this,box:geometry.boundingBox.clone()}); originalAdd.call(this, material, geometry); };
+Builder.prototype.finish = function(target) { for(const part of exitParts)if(part.builder===this)part.target=target; originalFinish.call(this,target); };
+const materials = Object.fromEntries(['oak', 'dark', 'brass', 'stone'].map(name => [name, new THREE.MeshStandardMaterial()]));
 const canvasCalls = [];
 const exitGeometry = addLibraryExit(exitScene, materials, EXIT_ANCHOR, EXIT_CONTENT, () => ({
   getContext: () => ({ fillRect() {}, strokeRect() {}, fillText: text => canvasCalls.push(text) })
 }));
-Builder.prototype.add = originalAdd;
+Builder.prototype.add = originalAdd;Builder.prototype.finish = originalFinish;exitGeometry.group.updateWorldMatrix(true,true);
 assert.equal(JSON.stringify(room.solids), solidsBefore);
 assert.deepEqual(canvasCalls, ['EXIT', 'HOME']);
-for (const box of exitParts) for (const base of room.pieces) {
+for (const part of exitParts) for (const base of room.pieces) {
+  const box=part.box.clone().applyMatrix4(part.target.matrixWorld);
   const size = box.clone().intersect(base).getSize(new THREE.Vector3());
   assert.ok(size.x < 0.00001 || size.y < 0.00001 || size.z < 0.00001, `Exit intersects existing room: ${box.min.toArray()} / ${base.min.toArray()}`);
 }
 const exitBounds = new THREE.Box3().setFromObject(exitGeometry.group);
-assert.ok(exitBounds.min.x - (7 - 0.28) > 0.05, 'door clears the near plane at closest legal camera');
+assert.ok(exitBounds.min.x - (7 - 0.28) > 0.05, 'closed joinery clears the near plane at closest legal camera');
 assert.ok(exitBounds.min.z > 6.7 && exitBounds.max.z < 8.6, 'clear of stair foot and south case');
 function blocked(x, z) {
   return room.solids.some(solid => x + .28 > solid.x0 && x - .28 < solid.x1 && z + .28 > solid.z0 && z - .28 < solid.z1 && solid.y0 < 1.75 && solid.y1 > .42);
@@ -196,7 +206,8 @@ const eye = new THREE.Vector3(5.6, 1.62, 7.75), toward = new THREE.Vector3(1, 0,
 assert.equal(pickAnchor(eye, toward, [EXIT_ANCHOR], room.solids, EXIT_ANCHOR.reach), EXIT_ANCHOR);
 assert.equal(pickAnchor(new THREE.Vector3(5.6, 5.82, 7.75), toward, [EXIT_ANCHOR], room.solids, EXIT_ANCHOR.reach), null);
 assert.equal(pickAnchor(new THREE.Vector3(3.4, 1.62, 7.75), toward, [EXIT_ANCHOR], room.solids, EXIT_ANCHOR.reach), null);
-cases.push('Actual room CPU construction: no old geometry intersections, unchanged solids, 280 mm player route, close-camera clearance, bounded downstairs reach');
-const budget = { drawCalls: exitGeometry.group.children.length, triangles: exitGeometry.group.children.reduce((n, object) => n + object.geometry.index.count / 3, 0), atlas: [512, 256], newLights: 0, shadowCasters: 0 };
+cases.push('Actual carved room CPU construction: exit adds no mutation to shell solids, closed joinery avoids existing geometry, 280 mm approach, near-plane clearance and bounded downstairs reach');
+const budget={drawCalls:0,triangles:0,atlas:[512,256],newLights:0,shadowCasters:0};
+exitGeometry.group.traverse(object=>{if(object.isMesh){budget.drawCalls++;budget.triangles+=object.geometry.index.count/3;}});
 disposeLibraryResources({ scene: exitScene, renderer: { dispose() {} }, materials: Object.values(materials) });
 console.log(JSON.stringify({ status: 'passed', cases, geometryBudget: budget, scope: 'CPU geometry and mock DOM/navigation; visual/native browser input and GPU not tested' }, null, 2));

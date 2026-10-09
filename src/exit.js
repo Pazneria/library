@@ -2,7 +2,7 @@ import { isEditingTarget } from './interaction-core.js';
 
 // Functional navigation is independent of the building and its artwork.
 export function installLibraryExit({ document: doc, window: win, canvas, controls, readerFooter,
-  content, getTarget, canInteract, beforeLeave }) {
+  content, getTarget, canInteract, beforeLeave, useDoor = () => true, getPrompt = () => content.prompt }) {
   let disposed = false, leaving = false, press = null;
   const removers = [], elements = [];
   const previousDescription = canvas.getAttribute('aria-describedby');
@@ -25,6 +25,13 @@ export function installLibraryExit({ document: doc, window: win, canvas, control
     }
     return true;
   }
+  function use(event) {
+    event?.preventDefault(); event?.stopPropagation();
+    if (leaving || disposed) return;
+    // Opening is reversible. It never queues a delayed navigation; another
+    // deliberate use or an outward threshold crossing is required to leave.
+    if (useDoor()) leave();
+  }
   function link(parent, className) {
     const a = doc.createElement('a');
     a.href = content.href; a.textContent = content.label;
@@ -45,7 +52,7 @@ export function installLibraryExit({ document: doc, window: win, canvas, control
   const hint = doc.createElement('button');
   hint.id = 'exit-hint'; hint.type = 'button'; hint.hidden = true; hint.textContent = content.prompt;
   hint.setAttribute('aria-label', content.label); doc.body.append(hint); elements.push(hint);
-  on(hint, 'click', event => { if (canInteract() && getTarget()) leave(event); });
+  on(hint, 'click', event => { if (canInteract() && getTarget()) use(event); });
   on(win, 'keydown', event => {
     if (event.repeat || event.defaultPrevented || event.isComposing) return;
     if (event.code === 'KeyX' && event.altKey && !event.ctrlKey && !event.metaKey &&
@@ -53,7 +60,7 @@ export function installLibraryExit({ document: doc, window: win, canvas, control
       leave(event); return;
     }
     if (event.code === 'KeyE' && !event.altKey && !event.ctrlKey && !event.metaKey &&
-      !isEditingTarget(event.target) && canInteract() && getTarget()) leave(event);
+      !isEditingTarget(event.target) && canInteract() && getTarget()) use(event);
   });
   on(canvas, 'mousedown', event => {
     press = event.button === 0 && canInteract() && getTarget() ?
@@ -68,14 +75,17 @@ export function installLibraryExit({ document: doc, window: win, canvas, control
   });
   on(canvas, 'click', event => {
     const deliberate = press && press.travel <= 5; press = null;
-    if (deliberate && event.button === 0 && canInteract() && getTarget()) leave(event);
+    if (deliberate && event.button === 0 && canInteract() && getTarget()) use(event);
   });
   on(win, 'blur', () => { press = null; hint.hidden = true; });
   on(doc, 'pointerlockchange', () => { press = null; hint.hidden = true; });
   return {
     leave,
     keyboardLink,
-    updateHint() { hint.hidden = disposed || !canInteract() || !getTarget(); },
+    updateHint() {
+      hint.hidden = disposed || !canInteract() || !getTarget();
+      hint.textContent = getPrompt(); hint.setAttribute('aria-label', hint.textContent);
+    },
     dispose() {
       if (disposed) return;
       disposed = true; press = null;

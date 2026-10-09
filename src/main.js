@@ -9,11 +9,11 @@ import { ROOM_ANCHORS, INTERACTION_REACH } from './room-anchors.js';
 import { addReadingBooks } from './reading-scene.js';
 import { pickAnchor, isEditingTarget } from './interaction-core.js';
 import { installReading } from './reading.js';
-import { addHillsideBooks, installHillsideReading } from './jippity-book/hillside.js';
+import { addHillsideBooks, installHillsideReading } from './library-books/hillside.js';
 import { createFrameLoop } from './frame-loop.js';
 import './reading.css';
 import { EXIT_CONTENT } from './exit-content.js';
-import { EXIT_ANCHOR } from './exit-anchor.js';
+import { EXIT_ANCHOR, EXIT_PORTAL } from './exit-anchor.js';
 import { addLibraryExit } from './exit-scene.js';
 import { installLibraryExit } from './exit.js';
 import { disposeLibraryResources } from './exit-resources.js';
@@ -73,13 +73,13 @@ const rand = rng(20261006);
 const M = makeMaterials();
 partial.materials = M;
 const books = new BookSet(rng(77));
-const lib = buildLibrary(M, books, rand);
+const lib = buildLibrary(M, books, rand, EXIT_PORTAL);
 lib.B.finish(scene);
 const bookMesh = books.build(bookAtlas(31));
 scene.add(bookMesh);
 const readingBooks = addHillsideBooks(scene, ROOM_ANCHORS, READING_CONTENT, addReadingBooks);
 const exitGeometry = addLibraryExit(scene, M, EXIT_ANCHOR, EXIT_CONTENT);
-const solids = lib.B.solids;
+const solids = [...lib.B.solids, ...exitGeometry.solids];
 // Instance buffers now own the uploaded book data. Release construction staging arrays.
 books.mats.length = books.cols.length = books.vars.length = 0;
 
@@ -211,6 +211,7 @@ function groundAt(x, z, feet) {
 }
 function blocked(x, z, feet, h) {
   const r = P.radius;
+  if (exitGeometry.door.blocks(x, z, feet, h, r)) return true;
   for (const s of solids) {
     if (x + r <= s.x0 || x - r >= s.x1 || z + r <= s.z0 || z - r >= s.z1) continue;
     if (s.y0 < feet + h && s.y1 > feet + P.step) return true;
@@ -262,6 +263,8 @@ exit = installLibraryExit({ document, window, canvas, content: EXIT_CONTENT,
   canInteract: () => !libraryDisposed && !reading.isOpen && !look.menuOpen && !loop?.paused && document.hasFocus(),
   getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), [EXIT_ANCHOR], solids, EXIT_ANCHOR.reach),
   beforeLeave: disposeLibrary,
+  useDoor: () => exitGeometry.door.use(),
+  getPrompt: () => exitGeometry.door.passable ? EXIT_CONTENT.prompt : EXIT_CONTENT.openPrompt,
 });
 
 const desiredVelocity = new THREE.Vector3();
@@ -329,9 +332,12 @@ renderer.compile(scene, camera);
 scene.traverse((o) => { const m = o.material; if (!m) return; for (const k of ['map', 'bumpMap']) if (m[k]) renderer.initTexture(m[k]); if (m.uniforms && m.uniforms.map) renderer.initTexture(m.uniforms.map.value); });
 renderer.shadowMap.needsUpdate = true;
 
+const previousFeet = new THREE.Vector3();
 function frame(now, rawDt) {
   const dt = Math.min(rawDt, 0.05);
   time += dt;
+  previousFeet.copy(P.pos);
+  exitGeometry.door.update(dt, P.pos, P.radius);
   updatePlayer(dt);
   hintT += dt;
   if (hintT >= 0.125) { hintT = 0; reading.updateHint(); exit.updateHint(); }
@@ -352,6 +358,8 @@ function frame(now, rawDt) {
   }
   // Production quality stays at the selected scale; no automatic resolution reduction.
   if (toastT > 0) { toastT -= dt; if (toastT <= 0) toastEl.classList.remove('show'); }
+  // Teardown/navigation is last: no disposed scene access follows a crossing.
+  if (exitGeometry.door.crossed(previousFeet, P.pos, P.radius)) exit.leave();
 }
 loop = createFrameLoop({ tick: frame, request: callback => window.requestAnimationFrame(callback), cancel: id => window.cancelAnimationFrame(id), now: () => performance.now() });
 const lifecycle = [];

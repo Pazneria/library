@@ -8,11 +8,13 @@ The frozen Lab benchmark and previous optimized copy remain separate. This repo
 contains one scene's source and compact production build, not the benchmark
 catalogue, archives, dependencies, screenshots or private project data.
 
-This combined review branch adds public reading, a bound Shapes & Sound book,
-a Home exit and layered meadow/broadleaf woodland around the window views.
-See [INTEGRATION_REVIEW.md](INTEGRATION_REVIEW.md) for the combined checks and
-pending native/visual QA, and [EXTERIOR.md](EXTERIOR.md) for scenery tradeoffs.
-It remains a draft; the earlier import/fix receipts describe the published base.
+Published main includes public reading, a bound Shapes & Sound book, a Home exit
+and layered meadow/broadleaf woodland around the window views. This book pass
+extends the existing bound asset to the welcome and a public shelf notebook.
+See [ROOM_GUIDE.md](ROOM_GUIDE.md) for room coordinates, the reusable content and
+placement pipeline, integration boundaries and pending rendered QA.
+[INTEGRATION_REVIEW.md](INTEGRATION_REVIEW.md) records the earlier integration;
+[EXTERIOR.md](EXTERIOR.md) explains the scenery tradeoffs.
 
 ## Controls
 
@@ -37,15 +39,18 @@ keyboard and mouse controls; touch controls have not been added.
 
 ## First shelf
 
-The central table holds a moss-green welcome book and a petrol-cloth bound
-**Shapes & Sound** book with foil, ivory page edges and a plum bookmark.
+The central table holds a moss-green bound welcome book and a petrol-cloth
+**Shapes & Sound** book, both using the existing foil, page-edge and ribbon asset.
+A small oxblood **A Working Notebook** lies on the north shelf downstairs.
 Approach, look at an item and press **E**, or deliberately click it.
 A small prompt appears within 2.2 m and is blocked by the room's collision
 walls/furniture. The upper northwest writing desk uses its existing paper as
 a discreet **Project Library** entrance.
 
-Reading opens a paper-colored modal, releases mouse capture and pauses the
-scene. Shapes & Sound presents six pages as three spreads; Previous/Next,
+Inspection opens a quiet detail view, releases mouse capture and pauses the
+scene. Read this book opens its pages; Book details returns without losing the
+current spread. Controls also offers a keyboard-accessible Public books list.
+Shapes & Sound presents six pages as three spreads; Previous/Next,
 the spread selector, Left/Right, Page Up/Down and Home/End turn pages. Reduced
 motion skips reader animation, and narrow layouts stack the pages in order.
 Escape, the reader's return button, or browser Back closes it. Focus returns to
@@ -58,10 +63,12 @@ point-strike example, with two primary papers linked. It makes no claim that
 arbitrary real rooms or recordings sound identical. Jippity's presence is the
 small book signature and the selected reading, with no simulated chat/activity.
 
-`src/reading-content.js` holds the welcome text and private destination link;
-`src/jippity-book/content.json` holds the editable premium book text and sources.
-`src/room-anchors.js` holds this building's three coordinates/interaction bounds.
-Stable content IDs let a future building replace the room adapter.
+`src/library-books/catalog.js` and its public JSON editions hold the welcome and
+notebook; `src/jippity-book/content.json` retains Shapes & Sound.
+`src/library-books/placements.js` holds their independent copy transforms.
+`src/reading-content.js` and `src/room-anchors.js` retain the existing desk
+destination and legacy compatibility records. Stable IDs let another building
+replace placements without rewriting pages.
 
 The desk creates only a user-activated link to the existing authenticated
 Project Library. Public source inspection reveals its destination, not private
@@ -131,7 +138,7 @@ events. They cover sensitivity, pitch, direct camera updates, fallback,
 focus/visibility, pending Escape cancellation and independence from simulated
 render cadence.
 
-All twelve combined CPU suites and the production build passed with Vite's
+The earlier twelve combined CPU suites and production build passed with Vite's
 existing >500 kB chunk advisory. The premium physical book is 466 triangles and
 one main draw call, adding 452 triangles and one main draw call over the replaced
 marker. Three generated atlases estimate 7,340,032 RGBA bytes with full mipmaps;
@@ -142,6 +149,11 @@ Captured book, scenery and trim views are available in the separate handoff
 evidence. Hardware mouse feel, physical display tearing and presented frame rate
 remain owner checks. No claim of higher frame rate is made.
 
-Project shelves and a physical private study remain future work. Personal
-notes stay in the existing authenticated Project Library; the desk offers
-navigation only.
+The current book pass runs fourteen CPU suites and uses three physical-book
+draws, 1,398 submitted triangles and 14,330,539 estimated RGBA texture bytes with
+full mipmaps. It shares geometry/masks, creates reader detail DOM lazily and has
+an explicit four-copy ceiling. These are construction counts, not performance
+measurements; native/visual QA awaits the parent graphics slot.
+
+The shelf notebook is a public project-book sample. Personal notes stay in the
+existing authenticated Project Library; the desk offers navigation only.

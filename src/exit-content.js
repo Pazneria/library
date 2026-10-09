@@ -4,7 +4,8 @@ export const EXIT_CONTENT = Object.freeze({
   plaque: 'EXIT',
   plaqueSubtitle: 'HOME',
   label: "Leave for Jordan's homepage",
-  prompt: 'E · Leave the library',
+  openPrompt: 'E \u00b7 Open the exit door',
+  prompt: 'E \u00b7 Leave, or walk through',
   shortcut: 'Alt+X',
-  instructions: 'Leave through the oak door beside the stair foot, or use the exit link in controls. Alt+X returns to Jordan’s homepage.',
+  instructions: "Approach the oak door beside the stair foot to open it, then walk through to leave. E or a deliberate click opens the door, or leaves when open. The controls exit link and Alt+X return to Jordan's homepage.",
 });
