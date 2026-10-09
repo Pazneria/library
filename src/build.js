@@ -138,7 +138,7 @@ export const ROOM = { H: 10.5, GY: 4.2 };
 // Keep visible trim faces clear of painted opening/reveal faces in every frame.
 const TRIM_CLEARANCE = 0.012;
 
-export function buildLibrary(M, books, rand) {
+export function buildLibrary(M, books, rand, exitPortal = null) {
   const B = new Builder(rand);
   const W = B.frame(0, 0, 0, 0);
   const H = ROOM.H, GY = ROOM.GY;
@@ -170,7 +170,23 @@ export function buildLibrary(M, books, rand) {
   W.sbox(M.floor, 14, 0.3, 19, 0, -0.15, -0.5);
   W.box(M.ceil, 15, 0.3, 20, 0, H + 0.15, -0.5);
   wall('z', -7.5, 7.5, -10.5, -10, 0, H, [], M.plaster);
-  wall('x', -10.5, 9.5, 7, 7.5, 0, H, [], M.plaster);
+  // Reuse each original box's UV offset pair for its split sections. This
+  // consumes the same RNG counts, preserving all other authored room geometry.
+  function exitSplit(mat, w, h, d, x, y, z, sections, solid = false) {
+    if (!exitPortal) { if (solid) W.sbox(mat, w, h, d, x, y, z); else W.box(mat, w, h, d, x, y, z); return; }
+    const offsets = [rand(), rand()];
+    for (const [sw, sh, sd, sx, sy, sz] of sections) {
+      let i = 0;
+      W.geo(mat, boxGeo(sw, sh, sd, mat.userData.ts || 1, () => offsets[i++]), sx, sy, sz);
+      if (solid) W.solid(sw, sh, sd, sx, sy, sz);
+    }
+  }
+  const portal = exitPortal || { z0: 7.07, z1: 8.43, height: 2.46 };
+  exitSplit(M.plaster, .5, H, 20, 7.25, H / 2, -.5, [
+    [.5, H, portal.z0 + 10.5, 7.25, H / 2, (portal.z0 - 10.5) / 2],
+    [.5, H - portal.height, portal.z1 - portal.z0, 7.25, (H + portal.height) / 2, (portal.z0 + portal.z1) / 2],
+    [.5, H, 9.5 - portal.z1, 7.25, H / 2, (9.5 + portal.z1) / 2],
+  ], true);
   const southWins = [[-5, -3, 4.5, 8.3], [2.6, 4.6, 4.5, 8.3]];
   wall('z', -7.5, 7.5, 9, 9.5, 0, H, southWins, M.plaster);
   const westWins = [[-5.6, -3.6, 0.9, 7.2], [-1.6, 0.4, 0.9, 7.2], [2.4, 7.4, 0, 3.4], [3.2, 6.6, 5.0, 8.0]];
@@ -230,8 +246,15 @@ export function buildLibrary(M, books, rand) {
   for (const z of [2.33, 7.47]) W.box(M.oak, 0.14, 3.5 + TRIM_CLEARANCE, 0.6, -7 + 0.07 + TRIM_CLEARANCE, (3.5 - TRIM_CLEARANCE) / 2, z);
   // wainscot under west windows & east wall south end
   for (const z of [-4.6, -0.6]) W.box(M.dark, 0.04, 0.85, 2.0, -6.98 + TRIM_CLEARANCE, 0.45, z);
-  W.box(M.dark, 0.05, 1.0, 2.2 - TRIM_CLEARANCE, 7 - 0.025 - TRIM_CLEARANCE, 0.5, 7.85 - TRIM_CLEARANCE / 2);
-  W.box(M.oak, 0.08, 0.06, 2.3 - TRIM_CLEARANCE, 6.96 - TRIM_CLEARANCE, 1.02, 7.85 - TRIM_CLEARANCE / 2);
+  function exitWainscot(mat, w, h, d, x, y, z) {
+    const low = z - d / 2, high = z + d / 2;
+    exitSplit(mat, w, h, d, x, y, z, [
+      [w, h, portal.z0 - low, x, y, (low + portal.z0) / 2],
+      [w, h, high - portal.z1, x, y, (portal.z1 + high) / 2],
+    ]);
+  }
+  exitWainscot(M.dark, .05, 1, 2.2 - TRIM_CLEARANCE, 7 - .025 - TRIM_CLEARANCE, .5, 7.85 - TRIM_CLEARANCE / 2);
+  exitWainscot(M.oak, .08, .06, 2.3 - TRIM_CLEARANCE, 6.96 - TRIM_CLEARANCE, 1.02, 7.85 - TRIM_CLEARANCE / 2);
 
   // ---- cornice, plaster band at gallery height, curtains at the tall windows
   for (const [w, d, x, z] of [[14, 0.3, 0, -9.85], [14, 0.3, 0, 8.85], [0.3, 19, -6.85, -0.5], [0.3, 19, 6.85, -0.5]]) {

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 
-export async function loadGeometry(root = new URL('../', import.meta.url)) {
+export async function loadGeometry(root = new URL('../', import.meta.url), exitPortal = null) {
   const threeURL = import.meta.resolve('three');
   const mergeURL = import.meta.resolve('three/addons/utils/BufferGeometryUtils.js');
   const source = readFileSync(new URL('src/build.js', root), 'utf8');
@@ -24,7 +24,7 @@ export async function loadGeometry(root = new URL('../', import.meta.url)) {
   };
   const books = new BookSet(rng(77));
   let room;
-  try { room = api.buildLibrary(materials, books, rng(20261006)); }
+  try { room = api.buildLibrary(materials, books, rng(20261006), exitPortal); }
   finally { api.Builder.prototype.add = add; }
   return { pieces, books, room };
 }

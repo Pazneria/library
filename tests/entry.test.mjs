@@ -12,7 +12,7 @@ assert.match(html,/<dialog id="overlay" aria-labelledby="controls-title">/);
 assert.ok(!/<dialog id="overlay"[^>]*\bopen\b/.test(html));
 assert.ok(!/#overlay[^\n]*transition/.test(html),'Entry must not fade a full-screen overlay');
 const scene=await loadGeometry(), listeners=new Map();
-const context={THREE,solids:scene.room.B.solids,ROOM:{GY:4.2},camera:new THREE.PerspectiveCamera(),toast:()=>{},isEditingTarget,
+const context={THREE,solids:scene.room.B.solids,exitGeometry:{door:{blocks:()=>false}},ROOM:{GY:4.2},camera:new THREE.PerspectiveCamera(),toast:()=>{},isEditingTarget,
   reading:null,loop:{paused:false},stats:{classList:{toggle(){}}},help:{classList:{toggle(){}}},
   addEventListener:(type,handler)=>listeners.set(type,handler)};
 vm.createContext(context);

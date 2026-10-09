@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 
 // Actual room builder with textures stubbed: bounded CPU geometry only.
-export async function loadRoom() {
+export async function loadRoom(exitPortal = null) {
   const threeURL = import.meta.resolve('three');
   const mergeURL = import.meta.resolve('three/addons/utils/BufferGeometryUtils.js');
   const source = readFileSync(new URL('../src/build.js', import.meta.url), 'utf8');
@@ -22,7 +22,7 @@ export async function loadRoom() {
     add.call(this, material, geometry);
   };
   const books = new BookSet(rng(77));
-  const room = api.buildLibrary(materials, books, rng(20261006));
+  const room = api.buildLibrary(materials, books, rng(20261006), exitPortal);
   api.Builder.prototype.add = add;
   return { solids: room.B.solids, pieces, books };
 }
