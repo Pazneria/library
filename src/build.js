@@ -1,6 +1,11 @@
 ﻿import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import * as TX from './textures.js';
+import { addReadingArmchair } from './reading-chairs/index.js';
+import { addWritingDesk } from './upstairs-desk/index.js';
+import { addReadingRug } from './reading-rug/index.js';
+import { makeGlobeMaterials } from './antique-globe/atlas.js';
+import { buildAntiqueGlobe } from './antique-globe/geometry.js';
 
 const _e = new THREE.Euler();
 const _q = new THREE.Quaternion();
@@ -128,7 +133,7 @@ export function makeMaterials() {
     ember: Object.assign(new THREE.MeshBasicMaterial({ color: new THREE.Color(2.2, 0.7, 0.2) }), { userData: { noShadow: true } }),
     rug: std({ map: TX.rugTexture(13), roughness: 1 }),
     painting: std({ map: TX.paintingAtlas(14), roughness: 0.55 }),
-    globe: std({ map: TX.globeTexture(15), roughness: 0.4 }),
+    ...makeGlobeMaterials(),
   };
 }
 
@@ -473,6 +478,13 @@ export function buildLibrary(M, books, rand, exitPortal = null) {
 
   // ---- furniture helpers
   function armchair(f, leather, wide = 0.9, wing = true) {
+    if (wing && wide === 0.9) {
+      addReadingArmchair(f, leather === M.leather2 ? 'tobacco' : 'oxblood');
+      // Original wingback: seven boxGeo calls consume exactly fourteen draws.
+      for (let i = 0; i < 14; i++) r();
+      f.solid(wide, 0.95, 0.86, 0, 0.47, 0);
+      return;
+    }
     const w = wide, d = 0.86;
     f.box(leather, w, 0.3, d, 0, 0.27, 0);
     f.box(leather, w - 0.3, 0.13, d - 0.24, 0, 0.48, 0.06);
@@ -560,8 +572,7 @@ export function buildLibrary(M, books, rand, exitPortal = null) {
   }
   // rugs
   {
-    const g = new THREE.PlaneGeometry(3.4, 5.6); g.rotateX(-Math.PI / 2);
-    W.geo(M.rug, g, -0.5, 0.008, 1.9);
+    addReadingRug(W);
     const g2 = new THREE.PlaneGeometry(3.4, 5.2); g2.rotateX(-Math.PI / 2); g2.rotateY(Math.PI / 2);
     W.geo(M.rug, g2, 0, 0.008, 6.8);
     const g3 = new THREE.PlaneGeometry(2.2, 3.2); g3.rotateX(-Math.PI / 2);
@@ -656,11 +667,9 @@ export function buildLibrary(M, books, rand, exitPortal = null) {
   // ---- globe near window B
   {
     const f = W.sub(-5.9, 0, -0.7, 0.3);
-    for (let i = 0; i < 3; i++) { const a = (i / 3) * Math.PI * 2; f.box(M.dark, 0.04, 0.75, 0.04, Math.cos(a) * 0.18, 0.37, Math.sin(a) * 0.18, Math.sin(a) * 0.25, 0, -Math.cos(a) * 0.25); }
-    f.torus(M.oak, 0.3, 0.03, 0, 0.76, 0, Math.PI / 2, 0, 0, 32);
-    f.torus(M.brass, 0.32, 0.01, 0, 1.0, 0, 0, 0, 0.4, 32);
-    const g = new THREE.SphereGeometry(0.29, 32, 20); g.rotateZ(0.4);
-    f.geo(M.globe, g, 0, 1.0, 0);
+    // Preserve the six UV-offset RNG draws consumed by the old three box legs.
+    for (let i = 0; i < 6; i++) r();
+    buildAntiqueGlobe(f, M);
     f.solid(0.7, 1.3, 0.7, 0, 0.65, 0);
   }
 
@@ -689,15 +698,11 @@ export function buildLibrary(M, books, rand, exitPortal = null) {
   // ---- gallery: desk at west end, reading chair overlooking the room on the east gallery
   {
     const f = W.sub(-5.6, GY, -8.85, 0);
-    f.box(M.oak, 1.4, 0.05, 0.7, 0, 0.76, 0);
-    for (const s of [-1, 1]) f.box(M.dark, 0.36, 0.72, 0.64, s * 0.5, 0.37, 0);
-    f.box(M.dark, 0.6, 0.12, 0.62, 0, 0.67, 0);
-    for (const s of [-1, 1]) for (let j = 0; j < 3; j++) { f.box(M.walnut, 0.32, 0.2, 0.02, s * 0.5, 0.16 + j * 0.22, 0.33); f.cyl(M.brass, 0.015, 0.015, 0.02, s * 0.5, 0.16 + j * 0.22, 0.345, 8, Math.PI / 2, 0, 0); }
+    addWritingDesk(f);
     f.solid(1.4, 0.8, 0.7, 0, 0.4, 0);
     bankerLamp(f, -0.4, 0.785, -0.1, 0);
     stackOn(f, 0.45, 0.785, -0.1, 5, 0);
     f.box(M.paper, 0.3, 0.004, 0.22, 0.05, 0.787, 0.1, 0, 0.2, 0);
-    f.cyl(M.iron, 0.025, 0.03, 0.045, -0.15, 0.81, -0.15, 10);
     chair(f.sub(0.05, 0, 0.6, Math.PI + 0.2));
     lights.push({ p: new THREE.Vector3(-5.9, GY + 1.25, -8.85), c: 0xffc27a, i: 4.5, d: 8 });
     armchair(W.sub(6.0, GY, -3.6, -Math.PI / 2), M.leather2);

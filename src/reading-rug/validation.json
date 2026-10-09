@@ -1,0 +1,98 @@
+{
+  "status": "passed",
+  "base": "f47874c78844936ee048cf45b81cf3827f5b35b7",
+  "threeRevision": "170",
+  "geometry": [
+    {
+      "name": "Reading rug / soft bound cloth",
+      "triangles": 1732,
+      "vertices": 976,
+      "geometryBytes": 41624,
+      "minimumTriangleArea": 0.000026205274544786452,
+      "signedVolume": 0.16449910350714295,
+      "worldBounds": [
+        [
+          -2.200000047683716,
+          0.003000000111758709,
+          -0.8000000476837159
+        ],
+        [
+          1.2000000476837158,
+          0.012599439911544323,
+          4.600000047683716
+        ]
+      ]
+    },
+    {
+      "name": "Reading rug / short split cotton fringe",
+      "triangles": 1920,
+      "vertices": 1440,
+      "geometryBytes": 57600,
+      "minimumTriangleArea": 0.000003609919608904555,
+      "signedVolume": 0.00023192621586671635,
+      "worldBounds": [
+        [
+          -2.103596806526184,
+          0.0033000000678002836,
+          -0.8975051403045655
+        ],
+        [
+          1.1003999710083008,
+          0.008600000028498471,
+          4.697714471817017
+        ]
+      ]
+    }
+  ],
+  "totalTriangles": 3652,
+  "netAddedTriangles": 3650,
+  "totalGeometryBytes": 99224,
+  "mainPassDraws": 2,
+  "netAddedMainPassDraws": 2,
+  "addedShadowPassDraws": 0,
+  "materials": 2,
+  "textures": [
+    {
+      "file": "./rug-albedo.png",
+      "width": 1024,
+      "height": 2048,
+      "fileBytes": 864482,
+      "sha256": "e1f0ec48a3bfa213696b9a0dc9e9a0d229c3bfeb11b830405f6af39ba8db7ee4",
+      "gpuBytesRGBA8WithFullMips": 11184812,
+      "chunks": [
+        "IHDR",
+        "sRGB",
+        "IDAT",
+        "IEND"
+      ]
+    },
+    {
+      "file": "./rug-detail.png",
+      "width": 512,
+      "height": 1024,
+      "fileBytes": 161921,
+      "sha256": "a9634a8ba4c2d49e99a38e49ad182bbafdc9794c0bd552f10ee42dd720d21be4",
+      "gpuBytesRGBA8WithFullMips": 2796204,
+      "chunks": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ]
+    }
+  ],
+  "gpuTextureBytesRGBA8WithFullMips": 13981016,
+  "preservedGeometryPieces": 2440,
+  "preservedSolidCount": 132,
+  "checks": [
+    "Finite attributes; no degenerate triangles; positive volumes; closed manifold winding",
+    "Original footprint and anchor, 3 mm floor clearance, <13 mm pile top",
+    "Linear detail / sRGB colour, mip filters, opaque depth-writing materials",
+    "All untouched scene geometry, books, collisions, lights and openings exactly equal",
+    "Existing resource disposer releases 2 geometries, 2 materials, 2 textures once"
+  ],
+  "limitations": [
+    "No 3D render, browser, server, native UI, GPU or performance test",
+    "Texture image loading/decoding stubbed; PNG structure and opacity checked on CPU",
+    "Draw counts are structural main-pass accounting, not observed renderer.info readings"
+  ]
+}
