@@ -82,6 +82,25 @@ additional access. Leaving stops the frame loop and input, disposes both reader
 types, and releases shared scene resources once. Generated canvas references
 are dropped. A cached Back restoration reconstructs the disposed scene.
 
+## Marginalia study
+
+The ordinary Library route includes Jippity's quiet study with public sample
+content only. Open Controls and choose **Find the hidden study**, then **Return
+to room**. This places you at the north bookcase, two bays right of the notebook.
+Aim at its brass ornament and press **E**, or deliberately click it: the latch
+pulls and tilts, then the bookcase swings inward. Walk through the opening.
+The doorway is continuous geometry, with collision protection throughout its arc.
+
+Inside, aim at the desk's loose page and press **E** to read the public note.
+Escape returns to the study. The inside brass pull closes/reopens the case;
+**Return to Library** provides a keyboard-accessible fallback. The entrance is
+theatrical, not authentication; the existing authenticated Project Library desk
+destination and all private records remain separate and unchanged.
+
+The reviewed brass latch is retained. The separate experimental book polish and
+ginkgo latch are not part of this release. `?jippityStudy=0` is an explicit
+diagnostic opt-out; no query is required to find or enter the study normally.
+
 ## Build and preview
 
 The lockfile retains Three 0.170.0 and Vite 5.4.21. With Node and dependencies:

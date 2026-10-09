@@ -74,12 +74,19 @@ const M = makeMaterials();
 partial.materials = M;
 const books = new BookSet(rng(77));
 const lib = buildLibrary(M, books, rand, EXIT_PORTAL);
+// Public Marginalia study is available on the ordinary Library route.
+// Explicit diagnostic opt-out skips its module, scene, textures and listeners.
+const studyModule = new URLSearchParams(window.location.search).get('jippityStudy') !== '0'
+  ? await import('./secret-study/index.js') : null;
+if (studyModule && partialDisposed) throw Object.assign(new Error('Study loading cancelled'), { name: 'AbortError' });
+const study = studyModule?.prepareStudy({ lib, books, materials: M, scene });
 lib.B.finish(scene);
 const bookMesh = books.build(bookAtlas(31));
 scene.add(bookMesh);
+study?.attachBooks(bookMesh.material.map);
 const readingBooks = addHillsideBooks(scene, ROOM_ANCHORS, READING_CONTENT, addReadingBooks);
 const exitGeometry = addLibraryExit(scene, M, EXIT_ANCHOR, EXIT_CONTENT);
-const solids = [...lib.B.solids, ...exitGeometry.solids];
+const solids = [...lib.B.solids, ...exitGeometry.solids, ...(study?.solids || [])];
 // Instance buffers now own the uploaded book data. Release construction staging arrays.
 books.mats.length = books.cols.length = books.vars.length = 0;
 
@@ -211,6 +218,7 @@ function groundAt(x, z, feet) {
 }
 function blocked(x, z, feet, h) {
   const r = P.radius;
+  if (study?.door.blocks(x, z, feet, h, r)) return true;
   if (exitGeometry.door.blocks(x, z, feet, h, r)) return true;
   for (const s of solids) {
     if (x + r <= s.x0 || x - r >= s.x1 || z + r <= s.z0 || z - r >= s.z1) continue;
@@ -247,7 +255,7 @@ function toast(s) { toastEl.textContent = s; toastEl.classList.add('show'); toas
 
 function releaseMovement() { keys.clear(); P.vel.set(0, 0, 0); }
 const look = installFpsLook({ canvas, overlay, menuButton: document.getElementById('controls-toggle'), player: P, camera, toast, releaseMovement,
-  isInputBlocked: () => Boolean(libraryDisposed || reading?.isOpen || loop?.paused),
+  isInputBlocked: () => Boolean(libraryDisposed || reading?.isOpen || study?.isOpen || loop?.paused),
   setMenuPaused: paused => loop?.setPaused('controls', paused),
 });
 const lookDirection = new THREE.Vector3();
@@ -256,7 +264,10 @@ reading = installHillsideReading({ legacyFactory: installReading, camera, solids
   returnFocus: canvas,
   canInteract: () => !libraryDisposed && !look.menuOpen && !loop?.paused && document.hasFocus(),
   getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), ROOM_ANCHORS, solids, INTERACTION_REACH),
-  setPaused: paused => loop?.setPaused('reading', paused)
+  setPaused: paused => {
+    loop?.setPaused('reading', paused);
+    if (paused && study?.isOpen) { study.closeNote(); look.pause(); }
+  }
 });
 exit = installLibraryExit({ document, window, canvas, content: EXIT_CONTENT,
   controls: overlay.querySelector('.card'), readerFooter: document.querySelector('.reader-footer'),
@@ -265,6 +276,11 @@ exit = installLibraryExit({ document, window, canvas, content: EXIT_CONTENT,
   beforeLeave: disposeLibrary,
   useDoor: () => exitGeometry.door.use(),
   getPrompt: () => exitGeometry.door.passable ? EXIT_CONTENT.prompt : EXIT_CONTENT.openPrompt,
+});
+study?.install({ document, window, canvas, camera, player: P, solids, look, releaseMovement,
+  controls: overlay.querySelector('.card'), toast,
+  canInteract: () => !libraryDisposed && !reading.isOpen && !look.menuOpen && !loop?.paused && document.hasFocus(),
+  setPaused: paused => loop?.setPaused('study-note', paused),
 });
 
 const desiredVelocity = new THREE.Vector3();
@@ -337,6 +353,7 @@ function frame(now, rawDt) {
   const dt = Math.min(rawDt, 0.05);
   time += dt;
   previousFeet.copy(P.pos);
+  if (study?.update(dt, P.pos)) renderer.shadowMap.needsUpdate = true;
   exitGeometry.door.update(dt, P.pos, P.radius);
   updatePlayer(dt);
   hintT += dt;
@@ -371,7 +388,7 @@ function disposeLibrary() {
   if (libraryDisposed) return;
   libraryDisposed = true;
   releaseMovement(); look.pause(); loop?.setPaused('exit', true);
-  exit?.dispose(); reading.dispose(); look.dispose(); loop?.dispose();
+  exit?.dispose(); study?.dispose(); reading.dispose(); look.dispose(); loop?.dispose();
   for (const remove of lifecycle) remove();
   disposeLibraryResources({ scene, renderer, environmentTarget,
     materials: Object.values(M), extraMaterials: [depthMat, ...exitGeometry.materials] });
@@ -401,7 +418,7 @@ loop.setPaused('visibility', document.visibilityState !== 'visible');
 loop.setPaused('focus', !document.hasFocus());
 loop.setPaused('handoff', Boolean(window.pazneriaRoomHandoff?.active));
 loop.start();
-window.__lib = { P, setView, solids, renderer, scene, camera, books: bookMesh, drawFrame, setPrepass: (v) => (usePrepass = v),
+window.__lib = { P, setView, solids, renderer, scene, camera, study, books: bookMesh, drawFrame, setPrepass: (v) => (usePrepass = v),
   sim: (codes, secs) => { codes.forEach((c) => keys.add(c)); for (let t = 0; t < secs; t += 1 / 60) updatePlayer(1 / 60); codes.forEach((c) => keys.delete(c)); return P.pos.toArray().map((v) => +v.toFixed(2)); } };
 loadingScreen.ready(() => { releaseMovement(); loop.setPaused('handoff', false); });
 }

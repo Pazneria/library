@@ -217,8 +217,8 @@
     },
     {
       "path": "src/main.js",
-      "bytes": 20673,
-      "sha256": "99d8ca07330690978e0cb89d2c583d30acc4031e2c7aafe406488519bcd2f201"
+      "bytes": 21828,
+      "sha256": "0a3879a94ec2b1a25084670b144ad8b5e648ce710d79caa11122ea66af0565f3"
     },
     {
       "path": "src/reading-chairs/geometry.js",
@@ -291,6 +291,46 @@
       "sha256": "9ce10dc196c7602771ffbc87a7052830314b27e59a915dcd78669acbe2c3ec76"
     },
     {
+      "path": "src/secret-study/atlas.js",
+      "bytes": 4751,
+      "sha256": "284dfe78ebdf9d166745d60746363d1268bc29ae38f81cf5ed2194e48d70b10e"
+    },
+    {
+      "path": "src/secret-study/carve.js",
+      "bytes": 4007,
+      "sha256": "6f509ae976f4fbf6f3ff0429f7f3adbaec9c1387e6c6687a56392f9a9660500f"
+    },
+    {
+      "path": "src/secret-study/index.js",
+      "bytes": 65,
+      "sha256": "37160e4daf95041a46a9c08a8aecfebba8ee8707496a77bf2048914a537d4fc7"
+    },
+    {
+      "path": "src/secret-study/interaction.js",
+      "bytes": 5667,
+      "sha256": "80fab4ac9fa882df184f59e9b8a52b69a32dd374e29a84e7c193fdaf89e85e9b"
+    },
+    {
+      "path": "src/secret-study/layout.js",
+      "bytes": 3316,
+      "sha256": "1164d0b674ad678011eead939d817558134f8b8536d461ec67b14e196984ac0d"
+    },
+    {
+      "path": "src/secret-study/room.js",
+      "bytes": 9824,
+      "sha256": "2f863ca2bcb5f60ac4e5b7cddea8bb29472aeff838103f0c024a7bc02dede6ee"
+    },
+    {
+      "path": "src/secret-study/scene.js",
+      "bytes": 3084,
+      "sha256": "3931d5ab3aeeb4e70c1f5cac5615e54348f5b15866202e37a4b4da0aa76352ae"
+    },
+    {
+      "path": "src/secret-study/study.css",
+      "bytes": 2066,
+      "sha256": "b641fe34149bdf67bf0c21d3cadc2b0b7129dc921fe8949f651a0167784ffbfd"
+    },
+    {
       "path": "src/textures.js",
       "bytes": 15995,
       "sha256": "ea0fbea566831426c1354ab2de7c542b7389fb5ba3fabcc9cadec6a76f3aa8be"
@@ -308,14 +348,24 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "docs/assets/index-BEw7uotr.js",
-      "bytes": 741071,
-      "sha256": "52ac23041d9abd4702a8ee937b0dc76641135a5e6f174955b4e29bd4f0c8bf45"
+      "path": "docs/assets/index-CQjlONzh.js",
+      "bytes": 21588,
+      "sha256": "bee754af7d1fcbb7ea06bb40e426892a8bcf6d8410e277ffc952d6bdb3838699"
     },
     {
       "path": "docs/assets/index-DBfS7BKH.css",
       "bytes": 12098,
       "sha256": "d5b3ea54f202a26286fdf2329acad7020e1b491a5643e4caea1631288e903825"
+    },
+    {
+      "path": "docs/assets/index-DcTZvglQ.js",
+      "bytes": 743282,
+      "sha256": "9e4535f4b7dae9c2bc791eb649d050a26fb123c01523e9af06c6908468ed9e01"
+    },
+    {
+      "path": "docs/assets/index-jUiaNZeA.css",
+      "bytes": 2089,
+      "sha256": "c1efc90b7c70ae4b4325cdf5df28d4a4efc5869b7e482c40285746dbf4b323cb"
     },
     {
       "path": "docs/assets/rug-albedo-DJLqXdw0.png",
@@ -330,9 +380,9 @@
     {
       "path": "docs/index.html",
       "bytes": 15139,
-      "sha256": "781f520a9251537ae6800157a2d71a51fbb179b541dec8e47ca082c8eb639ec2"
+      "sha256": "e59700b2137e81bd0ce46be010b43f6b6d7fa087d8616116557c0f906f4e8ce6"
     }
   ],
   "base": "/library/",
-  "productionBytes": 1794711
+  "productionBytes": 1820599
 }
