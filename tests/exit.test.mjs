@@ -162,6 +162,9 @@ const mainSource = readFileSync(new URL('../src/main.js', import.meta.url), 'utf
 const hostSource = mainSource.match(/function disposeLibrary\(\) \{[\s\S]*?\n\}/)[0];
 const hostCalls = [];
 const host = { libraryDisposed: false, releaseMovement: () => hostCalls.push('movement'),
+  seat: {dispose: () => hostCalls.push('seat-dispose')},findFolio(){},
+  findSeat: {removeEventListener: () => hostCalls.push('seat-route-listener-remove'),remove: () => hostCalls.push('seat-route-remove')},
+  folio: {releaseReferences: () => hostCalls.push('seat-reference-release')},
   look: { pause: () => hostCalls.push('look-pause'), dispose: () => hostCalls.push('look-dispose') },
   loop: { setPaused: (reason, state) => hostCalls.push(`pause-${reason}-${state}`), dispose: () => hostCalls.push('loop-dispose') },
   exit: { dispose: () => hostCalls.push('exit-dispose') }, study: { dispose: () => hostCalls.push('study-dispose') }, reading: { dispose: () => hostCalls.push('reader-dispose') },
@@ -170,7 +173,7 @@ const host = { libraryDisposed: false, releaseMovement: () => hostCalls.push('mo
   disposeLibraryResources: () => hostCalls.push('resources-dispose') };
 vm.createContext(host); vm.runInContext(hostSource + ';globalThis.disposeHost=disposeLibrary;', host);
 host.disposeHost(); host.disposeHost();
-assert.deepEqual(hostCalls, ['movement', 'look-pause', 'pause-exit-true', 'exit-dispose', 'study-dispose', 'reader-dispose', 'look-dispose', 'loop-dispose', 'listener-remove', 'resources-dispose']);
+assert.deepEqual(hostCalls, ['movement', 'look-pause', 'pause-exit-true', 'seat-dispose', 'seat-route-listener-remove', 'seat-route-remove', 'exit-dispose', 'study-dispose', 'reader-dispose', 'look-dispose', 'loop-dispose', 'listener-remove', 'resources-dispose', 'seat-reference-release']);
 assert.equal(host.window.__shafts, undefined); assert.equal(host.window.__lib, undefined);
 assert.match(mainSource, /beforeLeave: disposeLibrary/);
 cases.push('Actual main.js exit hook tears down movement/look/reader/frame loop/listeners/resources once and removes debug roots');

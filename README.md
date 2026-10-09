@@ -39,6 +39,14 @@ keyboard and mouse controls; touch controls have not been added.
 
 ## First shelf
 
+One walnut and umber-leather **Folio** chair faces the west windows at the east
+edge of the reading alcove. In Controls, choose **Find the Folio chair**, then
+**Return to room**. Aim at it and press **E**, or deliberately click after
+focusing the scene. Mouse look stays active while seated. **E**, **Escape**, or
+**Stand up** returns to clear standing ground. Reduced motion skips settlement.
+The existing alcove chairs and room art remain in place. See
+[the sitting integration](src/reading-seat/README.md) for ownership and checks.
+
 The central table holds a moss-green bound welcome book and a petrol-cloth
 **Shapes & Sound** book, both using the existing foil, page-edge and ribbon asset.
 A small oxblood **A Working Notebook** lies on the north shelf downstairs.

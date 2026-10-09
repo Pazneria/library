@@ -20,6 +20,9 @@ import { disposeLibraryResources } from './exit-resources.js';
 import './exit.css';
 import { createExterior } from './exterior/index.js';
 import { createLoadingScreen } from './loading.js';
+import { mountFolioSeat, folioApproach } from './reading-seat/hillside.js';
+import { installReadingSeat } from './reading-seat/interaction.js';
+import './reading-seat/seat.css';
 
 const partial = { scene: null, renderer: null, environmentTarget: null, materials: null, cleanup: null };
 let partialDisposed = false;
@@ -86,7 +89,9 @@ scene.add(bookMesh);
 study?.attachBooks(bookMesh.material.map);
 const readingBooks = addHillsideBooks(scene, ROOM_ANCHORS, READING_CONTENT, addReadingBooks);
 const exitGeometry = addLibraryExit(scene, M, EXIT_ANCHOR, EXIT_CONTENT);
-const solids = [...lib.B.solids, ...exitGeometry.solids, ...(study?.solids || [])];
+const folio = mountFolioSeat(scene);
+const seatOccluders = [...lib.B.solids, ...exitGeometry.solids, ...(study?.solids || [])];
+const solids = [...seatOccluders, ...folio.solids];
 // Instance buffers now own the uploaded book data. Release construction staging arrays.
 books.mats.length = books.cols.length = books.vars.length = 0;
 
@@ -229,7 +234,7 @@ function blocked(x, z, feet, h) {
 
 const keys = new Set();
 let crouch = false;
-let reading = null, loop = null;
+let reading = null, loop = null, seat = null;
 let exit = null, libraryDisposed = false;
 addEventListener('keydown', (e) => {
   if (libraryDisposed || reading?.isOpen || loop?.paused || isEditingTarget(e.target)) return;
@@ -256,7 +261,10 @@ function toast(s) { toastEl.textContent = s; toastEl.classList.add('show'); toas
 function releaseMovement() { keys.clear(); P.vel.set(0, 0, 0); }
 const look = installFpsLook({ canvas, overlay, menuButton: document.getElementById('controls-toggle'), player: P, camera, toast, releaseMovement,
   isInputBlocked: () => Boolean(libraryDisposed || reading?.isOpen || study?.isOpen || loop?.paused),
-  setMenuPaused: paused => loop?.setPaused('controls', paused),
+  setMenuPaused: paused => {
+    loop?.setPaused('controls', paused);
+    if (paused) seat?.cancel();
+  },
 });
 const lookDirection = new THREE.Vector3();
 reading = installHillsideReading({ legacyFactory: installReading, camera, solids, document, window, canvas, content: READING_CONTENT, look, releaseMovement,
@@ -266,6 +274,7 @@ reading = installHillsideReading({ legacyFactory: installReading, camera, solids
   getTarget: () => pickAnchor(camera.position, camera.getWorldDirection(lookDirection), ROOM_ANCHORS, solids, INTERACTION_REACH),
   setPaused: paused => {
     loop?.setPaused('reading', paused);
+    if (paused) seat?.cancel();
     if (paused && study?.isOpen) { study.closeNote(); look.pause(); }
   }
 });
@@ -280,8 +289,31 @@ exit = installLibraryExit({ document, window, canvas, content: EXIT_CONTENT,
 study?.install({ document, window, canvas, camera, player: P, solids, look, releaseMovement,
   controls: overlay.querySelector('.card'), toast,
   canInteract: () => !libraryDisposed && !reading.isOpen && !look.menuOpen && !loop?.paused && document.hasFocus(),
-  setPaused: paused => loop?.setPaused('study-note', paused),
+  setPaused: paused => {
+    loop?.setPaused('study-note', paused);
+    if (paused) seat?.cancel();
+  },
 });
+
+seat = installReadingSeat({document,window,canvas,player:P,camera,chair:folio.chair,solids:seatOccluders,
+  canInteract: () => !libraryDisposed && !reading.isOpen && !study?.isOpen && !look.menuOpen && !loop?.paused &&
+    document.visibilityState === 'visible' && document.hasFocus() &&
+    (seat?.ownsMovement || Math.hypot(P.pos.x-camera.position.x,P.pos.z-camera.position.z)<.05),
+  canStandAt: ([x,y,z]) => Math.abs(groundAt(x,z,y)-y)<.01 && !blocked(x,z,y,crouch?1.15:P.height),
+  recoverStanding: () => {setView(0);updatePlayer(0);},releaseMovement,
+  standingEyeHeight: () => crouch?1.0:P.eye,toast
+});
+const findSeat = document.createElement('button');findSeat.type='button';findSeat.className='seat-find';
+findSeat.textContent='Find the Folio chair';overlay.querySelector('.card').append(findSeat);
+function findFolio() {
+  if (libraryDisposed) return;
+  seat.cancel();releaseMovement();
+  const view=folioApproach(folio.chair,crouch?1.0:P.eye);
+  P.pos.set(...view.position);P.smoothY=P.pos.y;P.vy=0;P.eyeCur=crouch?1.0:P.eye;
+  P.yaw=view.yaw;P.pitch=view.pitch;updatePlayer(0);drawFrame();
+  toast('Folio at the window alcove. Return to room, then press E to sit.');
+}
+findSeat.addEventListener('click',findFolio);
 
 const desiredVelocity = new THREE.Vector3();
 function updatePlayer(dt) {
@@ -355,9 +387,9 @@ function frame(now, rawDt) {
   previousFeet.copy(P.pos);
   if (study?.update(dt, P.pos)) renderer.shadowMap.needsUpdate = true;
   exitGeometry.door.update(dt, P.pos, P.radius);
-  updatePlayer(dt);
+  if (seat?.ownsMovement) seat.update(dt); else updatePlayer(dt);
   hintT += dt;
-  if (hintT >= 0.125) { hintT = 0; reading.updateHint(); exit.updateHint(); }
+  if (hintT >= 0.125) { hintT = 0; reading.updateHint(); exit.updateHint(); seat?.update(0); }
   for (const l of lamps) if (l.userData.fire) l.intensity = l.userData.i * (0.82 + 0.12 * Math.sin(time * 9.1) + 0.08 * Math.sin(time * 23.7 + 1.3));
   window.__shafts.uniforms.t.value = time;
   dustMat.uniforms.t.value = time;
@@ -388,10 +420,12 @@ function disposeLibrary() {
   if (libraryDisposed) return;
   libraryDisposed = true;
   releaseMovement(); look.pause(); loop?.setPaused('exit', true);
+  seat?.dispose();findSeat.removeEventListener('click',findFolio);findSeat.remove();
   exit?.dispose(); study?.dispose(); reading.dispose(); look.dispose(); loop?.dispose();
   for (const remove of lifecycle) remove();
   disposeLibraryResources({ scene, renderer, environmentTarget,
     materials: Object.values(M), extraMaterials: [depthMat, ...exitGeometry.materials] });
+  folio.releaseReferences();
   delete window.__shafts; delete window.__lib;
   if (window.__libraryLoading?.state === 'ready') {
     window.__libraryLoading.dispose(); delete window.__libraryLoading;

@@ -34,7 +34,7 @@ function fixture(enabled=true){
   const look={menuOpen:false,pause(){suspended=true;},resume(){suspended=false;}};
   const releaseMovement=()=>{h.calls.release++;player.vel.set(0,0,0);};
   const controls=h.doc.createElement('div');
-  const context={loop,look,libraryDisposed:false,document:h.doc};
+  const context={loop,look,seat:{cancel(){}},libraryDisposed:false,document:h.doc};
   Object.defineProperty(context,'reading',{get:()=>book});
   Object.defineProperty(context,'study',{get:()=>enabled?ui:null});
   const setReadingPaused=vm.runInNewContext('('+readingPause+')',context);
