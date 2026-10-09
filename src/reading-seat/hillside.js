@@ -1,6 +1,6 @@
 import {BufferGeometry,BufferAttribute,MeshStandardMaterial,DataTexture,Group,Mesh,
   RGBAFormat,UnsignedByteType,RepeatWrapping,LinearMipmapLinearFilter,LinearFilter,SRGBColorSpace} from 'three';
-import {createFolioChair} from './folio-refined/folio-chair.mjs';
+import {createFolioChair} from './folio-rounded/folio-chair.mjs';
 import {compileFolioSeatInterface} from './folio-interface.js';
 
 // One independently placed reading chair. Existing room art and RNG stay intact.

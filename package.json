@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:folio": "node tests/reading-seat.test.mjs && node tests/folio-seat.test.mjs && node tests/folio-refinement.test.mjs && node tests/folio-live.test.mjs",
+    "test:folio": "node tests/reading-seat.test.mjs && node tests/folio-seat.test.mjs && node tests/folio-refinement.test.mjs && node tests/folio-live.test.mjs && node tests/folio-armrests.test.mjs",
     "test:study": "node tests/secret-study.test.mjs && node tests/study-interaction.test.mjs && node tests/study-scene.test.mjs && node tests/study-seam.test.mjs",
     "dev": "vite --port 5418 --strictPort --host 127.0.0.1",
     "build": "vite build && node scripts/build-manifest.mjs",
