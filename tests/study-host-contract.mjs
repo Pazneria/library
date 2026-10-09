@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
+import {withoutFolioHooks} from './folio-host-contract.mjs';
 // Preserve the old exact-host guarantee after removing only the enumerated,
 // reviewed study hooks. Missing or additional changes still fail the comparison.
 export function withoutStudyHooks(source) {
-  const newline=source.includes('\r\n')?'\r\n':'\n';let s=source;
+  const newline=source.includes('\r\n')?'\r\n':'\n';let s=withoutFolioHooks(source);
   const hooks=[
     ["// Public Marginalia study is available on the ordinary Library route.\n// Explicit diagnostic opt-out skips its module, scene, textures and listeners.\nconst studyModule = new URLSearchParams(window.location.search).get('jippityStudy') !== '0'\n  ? await import('./secret-study/index.js') : null;\nif (studyModule && partialDisposed) throw Object.assign(new Error('Study loading cancelled'), { name: 'AbortError' });\nconst study = studyModule?.prepareStudy({ lib, books, materials: M, scene });\n",''],
     ['study?.attachBooks(bookMesh.material.map);\n',''],
