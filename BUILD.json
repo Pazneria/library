@@ -306,6 +306,21 @@
       "sha256": "905db3ffbd9c73dfec87a4a20ca1d773ac9fe8f32e221ed3e79aa8179d07db2d"
     },
     {
+      "path": "src/reading-seat/folio-rounded/README.md",
+      "bytes": 1963,
+      "sha256": "cb1855b93ec0e91104f2942ba1434079ccc5ad181a20b950e957045e86075e2d"
+    },
+    {
+      "path": "src/reading-seat/folio-rounded/folio-chair.mjs",
+      "bytes": 1480,
+      "sha256": "44a540c14acf87a015878063b1af57ecb6d5afe84094fb96bc5e76ea9485c48d"
+    },
+    {
+      "path": "src/reading-seat/folio-rounded/folio-core.mjs",
+      "bytes": 6583,
+      "sha256": "e4fe5767289609bde5c549076a8231be2ea3b059ecddc2805988df47db6cde67"
+    },
+    {
       "path": "src/reading-seat/folio/folio-chair.mjs",
       "bytes": 3810,
       "sha256": "53006c52f457d0dd41f86ee7182a888b9c304cc631d0a692368ffed1dd71a639"
@@ -318,7 +333,7 @@
     {
       "path": "src/reading-seat/hillside.js",
       "bytes": 1555,
-      "sha256": "01d2c03dee1f40e396f1cbbaeec1269482e77c36af072d4900b6ab7835eb4b9b"
+      "sha256": "dff64447b83b087425ba9dd77aef31dc698ae9da7aaecbf45608a5ee5fe8bdb4"
     },
     {
       "path": "src/reading-seat/interaction.js",
@@ -403,14 +418,14 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "docs/assets/index-5L12cqxx.js",
-      "bytes": 21588,
-      "sha256": "aec64b0661a33f2e09ee893b953bad42df4f703de4c68f426533c6bf42f235e4"
+      "path": "docs/assets/index-BLqCZGpw.js",
+      "bytes": 777919,
+      "sha256": "c5930070d276537b7335595396d1959f3c2a5eb287ec82af5d5fed5837e14b2b"
     },
     {
-      "path": "docs/assets/index-B_2gjpef.js",
-      "bytes": 773477,
-      "sha256": "0d4b9cece3528e31414ee8b5a1a3dc9748b715c2a70d7d19fa0e5dc05b1c45c8"
+      "path": "docs/assets/index-Cd0OQBB_.js",
+      "bytes": 21588,
+      "sha256": "5dc3e9080b9466abe522e85fef44478ba8293e2bbd636f8eb4e41f925b91a42c"
     },
     {
       "path": "docs/assets/index-DwsfF1R8.css",
@@ -435,9 +450,9 @@
     {
       "path": "docs/index.html",
       "bytes": 15139,
-      "sha256": "33111e30a45b76bcb1d472460c02b9307861bb80857d57d5440eecbb1aeacf4a"
+      "sha256": "cb9a8415e0035465169659f4d9cd4b2c715c15480d6828249d029f620f12de8e"
     }
   ],
   "base": "/library/",
-  "productionBytes": 1851613
+  "productionBytes": 1856055
 }

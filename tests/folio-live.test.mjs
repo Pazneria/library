@@ -21,6 +21,8 @@ for(const [name,expected]of [['folio-core.mjs','905db3ffbd9c73dfec87a4a20ca1d773
   assert.equal(createHash('sha256').update(readFileSync(new URL('src/reading-seat/folio-refined/'+name,root))).digest('hex'),expected);
 }
 const scene=new THREE.Scene(),mounted=mountFolioSeat(scene),chair=mounted.chair;
+const performance=scene.children[0].userData.folio.performance;
+const geometryBytes=scene.children[0].children.reduce((bytes,mesh)=>bytes+Object.values(mesh.geometry.attributes).reduce((sum,a)=>sum+a.array.byteLength,0)+mesh.geometry.index.array.byteLength,0);
 assert.equal(scene.children.length,1);assert.equal(scene.children[0].children.length,5);
 assert.deepEqual(scene.children[0].position.toArray(),FOLIO_PLACEMENT.position);
 const room=await loadGeometry(undefined,EXIT_PORTAL),bounds=new THREE.Box3().setFromObject(scene.children[0]);
@@ -59,8 +61,9 @@ player.pos.set(...foot);assert.ok(seat.sit());seat.update(.5);assert.equal(gate(
 seat.dispose();loop.dispose();
 const resources=new Set();scene.traverse(o=>{if(o.geometry)resources.add(o.geometry);for(const m of [].concat(o.material||[])){resources.add(m);for(const v of Object.values(m))if(v?.isTexture)resources.add(v);}});
 assert.equal(resources.size,16);const disposed=new Map();for(const r of resources)r.addEventListener('dispose',()=>disposed.set(r,(disposed.get(r)||0)+1));
+const textureBackingBytes=[...resources].filter(r=>r.isTexture).reduce((bytes,t)=>bytes+t.image.data.byteLength,0);
 let rendererDisposals=0;disposeLibraryResources({scene,renderer:{dispose(){rendererDisposals++;}}});mounted.releaseReferences();
 assert.equal(rendererDisposals,1);assert.equal(scene.children.length,0);assert.equal(disposed.size,16);assert.ok([...disposed.values()].every(n=>n===1));
 console.log(JSON.stringify({status:'passed',base,protectedPaths:protectedPaths.length,placement:FOLIO_PLACEMENT,approach,
   cases:['Reviewed candidate bytes exact; every prior source other than enumerated main hooks remains exact','One chair mounts; actual envelope and supported standing anchors clear authored room','Actual Controls, book and study-note callbacks safely cancel seating through 36 transitions without releasing focus pause','A rapid distant-view handoff rejects a stale camera ray while the seated eye offset still permits standing','Existing host disposer releases all 16 attached chair resources once'],
-  resources:{triangles:19320,materialBatches:5,geometries:5,materials:5,textures:6,geometryBytes:523024,textureBackingBytes:6815744},scope:'CPU actual modules and host callbacks; actual lighting/native input acceptance is separate.'},null,2));
+  resources:{triangles:performance.triangles,materialBatches:performance.drawCalls,geometries:5,materials:5,textures:6,geometryBytes,textureBackingBytes},scope:'CPU actual modules and host callbacks; actual lighting/native input acceptance is separate.'},null,2));
