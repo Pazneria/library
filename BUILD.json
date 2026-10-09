@@ -2,8 +2,8 @@
   "sourceFiles": [
     {
       "path": "index.html",
-      "bytes": 8258,
-      "sha256": "e10e528a504e2b0b7eb69029ca7062675d692fdc7dfcd754ddcb1a5ffd36de0b"
+      "bytes": 15043,
+      "sha256": "0bff091e1cc872f3cbfb373f035a9b6397c2a7f64b684ce5099ef6d6c2fc55ca"
     },
     {
       "path": "src/books.js",
@@ -127,8 +127,8 @@
     },
     {
       "path": "src/loading.js",
-      "bytes": 3511,
-      "sha256": "b5182634aa93b79e25aba88a290f7eb47bcd3a04551d54d65b8b3d89d8669423"
+      "bytes": 4609,
+      "sha256": "712237a3e21c465ce218fd9f1b3a1d865653abc2e99798ee1df22dd8239e06ca"
     },
     {
       "path": "src/look.js",
@@ -137,8 +137,8 @@
     },
     {
       "path": "src/main.js",
-      "bytes": 19923,
-      "sha256": "273efb1e5cfeadbc4d42fae9cc5d59df8a926dc10faa10c7fa28d91b7e3137f2"
+      "bytes": 20133,
+      "sha256": "79088f69a1a9d2c45fef242c5ee98db5a6e957ee2990aed2bd59d6c2207a7494"
     },
     {
       "path": "src/reading-content.js",
@@ -183,16 +183,16 @@
       "sha256": "2ce1bc6f9895acc85c9fc2abc0410b0414da199a1af035e1bc31028d97210d52"
     },
     {
-      "path": "docs/assets/index-CeFztUW9.js",
-      "bytes": 595916,
-      "sha256": "d81247dcb8f1e7fae11ab43926e36c6464f67c4d6daa042098bcf6115023a350"
+      "path": "docs/assets/index-Cr8VsKt6.js",
+      "bytes": 596632,
+      "sha256": "8fc965aedb38ec906de509bc83b36e0a67298251bc1d5afce369504813e2e167"
     },
     {
       "path": "docs/index.html",
-      "bytes": 8354,
-      "sha256": "731b58156732efe39df5b572e5a03df163d243f2b94214e52b78fa979f7002c1"
+      "bytes": 15139,
+      "sha256": "f1fca9a909c8c38d1683680fbca012d8d2884e61bc3e92acb3737695d46ac182"
     }
   ],
   "base": "/library/",
-  "productionBytes": 613714
+  "productionBytes": 621215
 }

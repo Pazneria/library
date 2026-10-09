@@ -3,7 +3,21 @@ export function createLoadingScreen({ document: doc, window: win, onCancel = () 
   const screen = doc.getElementById('loading'), status = doc.getElementById('loading-status');
   const retry = doc.getElementById('loading-retry'), error = doc.getElementById('loading-error');
   win.__libraryBootErrorCleanup?.();
+  const handoff = win.pazneriaRoomHandoff;
   let state = 'loading', pending = null, fadeTimer = null, disposed = false, cancelled = false;
+  let revealObserver = null, reveal = null;
+  function stopReveal() {
+    revealObserver?.disconnect(); revealObserver = null; reveal = null;
+  }
+  function finishReveal() {
+    if (!reveal || handoff?.active) return;
+    const callback = reveal;
+    stopReveal();
+    if (doc.visibilityState === 'visible' && doc.hasFocus()) {
+      doc.getElementById('c')?.focus({ preventScroll: true });
+    }
+    callback();
+  }
   const abort = () => Object.assign(new Error('Library loading cancelled'), { name: 'AbortError' });
   function clearPending() {
     if (!pending) return;
@@ -18,13 +32,13 @@ export function createLoadingScreen({ document: doc, window: win, onCancel = () 
   }
   function cancel() {
     if (cancelled || disposed || state !== 'loading') return;
-    cancelled = true; state = 'cancelled'; clearPending(); onCancel();
+    cancelled = true; state = 'cancelled'; clearPending(); stopReveal(); handoff?.fail(); onCancel();
   }
-  function pageHide() { if (state === 'loading') cancel(); else finishFade(); }
+  function pageHide() { stopReveal(); if (state === 'loading') cancel(); else finishFade(); }
   function pageShow(event) { if (cancelled && event.persisted) win.location.reload(); }
   function fail() {
     if (disposed || cancelled) return;
-    state = 'error'; clearPending(); finishFade();
+    state = 'error'; clearPending(); stopReveal(); handoff?.fail(); finishFade();
     screen.hidden = false; screen.classList.remove('is-ready'); screen.dataset.state = 'error';
     screen.setAttribute('aria-busy', 'false'); status.textContent = 'Library could not load.';
     error.hidden = retry.hidden = false;
@@ -49,11 +63,23 @@ export function createLoadingScreen({ document: doc, window: win, onCancel = () 
       });
       if (disposed || cancelled) throw abort();
     },
-    ready() {
+    ready(onReveal = () => {}) {
       if (disposed || cancelled || state !== 'loading') return;
       state = 'ready'; screen.dataset.stage = '4'; screen.dataset.state = 'ready';
       screen.setAttribute('aria-busy', 'false'); status.textContent = 'Ready';
       win.__libraryBootErrorCleanup?.();
+      if (handoff?.active) {
+        // The host has drawn the matching entrance. Keep input paused until the
+        // canonical cover is removed, including its reduced-motion path.
+        screen.hidden = true;
+        reveal = onReveal;
+        revealObserver = new win.MutationObserver(finishReveal);
+        revealObserver.observe(doc.documentElement, { attributes: true, attributeFilter: ['data-room-handoff'] });
+        handoff.ready();
+        finishReveal();
+        return;
+      }
+      onReveal();
       screen.classList.add('is-ready');
       if (win.matchMedia?.('(prefers-reduced-motion: reduce)').matches) finishFade();
       else fadeTimer = win.setTimeout(finishFade, 240);
@@ -61,7 +87,7 @@ export function createLoadingScreen({ document: doc, window: win, onCancel = () 
     fail,
     dispose() {
       if (disposed) return;
-      disposed = true; clearPending(); finishFade(); win.__libraryBootErrorCleanup?.();
+      disposed = true; clearPending(); stopReveal(); handoff?.fail(); finishFade(); win.__libraryBootErrorCleanup?.();
       retry.removeEventListener('click', retryLoad);
       win.removeEventListener('pagehide', pageHide); win.removeEventListener('pageshow', pageShow);
       screen.removeEventListener('transitionend', finishFade);
