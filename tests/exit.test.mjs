@@ -164,13 +164,13 @@ const hostCalls = [];
 const host = { libraryDisposed: false, releaseMovement: () => hostCalls.push('movement'),
   look: { pause: () => hostCalls.push('look-pause'), dispose: () => hostCalls.push('look-dispose') },
   loop: { setPaused: (reason, state) => hostCalls.push(`pause-${reason}-${state}`), dispose: () => hostCalls.push('loop-dispose') },
-  exit: { dispose: () => hostCalls.push('exit-dispose') }, reading: { dispose: () => hostCalls.push('reader-dispose') },
+  exit: { dispose: () => hostCalls.push('exit-dispose') }, study: { dispose: () => hostCalls.push('study-dispose') }, reading: { dispose: () => hostCalls.push('reader-dispose') },
   lifecycle: [() => hostCalls.push('listener-remove')], scene: {}, renderer: {}, environmentTarget: {},
   M: {}, depthMat: {}, exitGeometry: { materials: [] }, window: { __shafts: {}, __lib: {} },
   disposeLibraryResources: () => hostCalls.push('resources-dispose') };
 vm.createContext(host); vm.runInContext(hostSource + ';globalThis.disposeHost=disposeLibrary;', host);
 host.disposeHost(); host.disposeHost();
-assert.deepEqual(hostCalls, ['movement', 'look-pause', 'pause-exit-true', 'exit-dispose', 'reader-dispose', 'look-dispose', 'loop-dispose', 'listener-remove', 'resources-dispose']);
+assert.deepEqual(hostCalls, ['movement', 'look-pause', 'pause-exit-true', 'exit-dispose', 'study-dispose', 'reader-dispose', 'look-dispose', 'loop-dispose', 'listener-remove', 'resources-dispose']);
 assert.equal(host.window.__shafts, undefined); assert.equal(host.window.__lib, undefined);
 assert.match(mainSource, /beforeLeave: disposeLibrary/);
 cases.push('Actual main.js exit hook tears down movement/look/reader/frame loop/listeners/resources once and removes debug roots');

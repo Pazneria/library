@@ -91,7 +91,7 @@ assert.ok(Math.abs(hinge.x-(EXIT_ANCHOR.position[0]-.00035))<1e-12);assert.equal
 cases.push('Actual rigid leaf is sampled at every degree from closed to 90 degrees; pivot matches collision math, and leaf/casing/landing clear the wall, stair, bookcases and each other');
 
 const source=readFileSync(new URL('../src/main.js',import.meta.url),'utf8').replaceAll('\r\n','\n');
-const listeners=new Map(),context={THREE,solids:[...carved.room.B.solids,...geometry.solids],exitGeometry:geometry,ROOM:{GY:4.2},camera:new THREE.PerspectiveCamera(),toast(){},isEditingTarget,
+const listeners=new Map(),context={THREE,study:null,solids:[...carved.room.B.solids,...geometry.solids],exitGeometry:geometry,ROOM:{GY:4.2},camera:new THREE.PerspectiveCamera(),toast(){},isEditingTarget,
   stats:{classList:{toggle(){}}},help:{classList:{toggle(){}}},addEventListener:(type,handler)=>listeners.set(type,handler)};
 vm.createContext(context);
 vm.runInContext(source.slice(source.indexOf('const P ='),source.indexOf('const overlay ='))+';loop={paused:false};'+
