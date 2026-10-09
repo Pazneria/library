@@ -384,16 +384,18 @@ listen(window, 'pagehide', event => {
 });
 listen(window, 'pageshow', () => {
   look.resume(); loop.setPaused('page', false);
+  loop.setPaused('handoff', Boolean(window.pazneriaRoomHandoff?.active));
   loop.setPaused('visibility', document.visibilityState !== 'visible');
   loop.setPaused('focus', !document.hasFocus());
 });
 drawFrame();
 loop.setPaused('visibility', document.visibilityState !== 'visible');
 loop.setPaused('focus', !document.hasFocus());
+loop.setPaused('handoff', Boolean(window.pazneriaRoomHandoff?.active));
 loop.start();
 window.__lib = { P, setView, solids, renderer, scene, camera, books: bookMesh, drawFrame, setPrepass: (v) => (usePrepass = v),
   sim: (codes, secs) => { codes.forEach((c) => keys.add(c)); for (let t = 0; t < secs; t += 1 / 60) updatePlayer(1 / 60); codes.forEach((c) => keys.delete(c)); return P.pos.toArray().map((v) => +v.toFixed(2)); } };
-loadingScreen.ready();
+loadingScreen.ready(() => { releaseMovement(); loop.setPaused('handoff', false); });
 }
 startLibrary().catch(error => {
   if (error.name !== 'AbortError') {

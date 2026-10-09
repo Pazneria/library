@@ -21,6 +21,12 @@ const input=source.slice(source.indexOf('const keys ='),source.indexOf('const ov
 const update=source.slice(source.indexOf('const desiredVelocity'),source.indexOf('// --------------------------------------------------------------- loop + stats'));
 vm.runInContext(setup+input+';loop={paused:false};'+update+';globalThis.player=P;globalThis.tick=updatePlayer;globalThis.view=setView;globalThis.state={get keys(){return keys;},set modal(v){reading=v;},set paused(v){loop.paused=v;}};',context);
 context.view(0);context.tick(0);
+assert.deepEqual(context.player.pos.toArray(),[3.4,0,4.3]);
+assert.deepEqual(context.camera.position.toArray(),[3.4,1.62,4.3]);
+assert.equal(context.player.yaw,.78);assert.equal(context.player.pitch,.1);
+assert.equal(context.player.vel.length(),0);
+assert.match(source,/new THREE\.PerspectiveCamera\(70, window\.innerWidth \/ window\.innerHeight, 0\.05, 2500\)/);
+assert.match(source,/camera\.rotation\.order = 'YXZ'/);
 const before=context.player.pos.clone();
 listeners.get('keydown')({code:'KeyW',target:{closest:()=>null},repeat:false});
 for(let i=0;i<30;i++)context.tick(1/60);
